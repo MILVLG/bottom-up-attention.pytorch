@@ -40,7 +40,7 @@ def main():
     parser = argparse.ArgumentParser(description="PyTorch Object Detection2 Inference")
     parser.add_argument(
         "--config-file",
-        default="configs/extract-bua-caffe-r101.yaml",
+        default="configs/bua-caffe/extract-bua-caffe-r101.yaml",
         metavar="FILE",
         help="path to config file",
     )
@@ -49,10 +49,10 @@ def main():
 
     parser.add_argument('--out_dir', dest='output_dir',
                         help='output directory for features',
-                        default="compare/features")
+                        default="features")
     parser.add_argument('--image_dir', dest='image_dir',
                         help='directory with images',
-                        default="compare/test")
+                        default="image")
     parser.add_argument(
         "--resume",
         action="store_true",

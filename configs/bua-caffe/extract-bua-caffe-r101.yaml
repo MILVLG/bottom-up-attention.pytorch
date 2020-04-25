@@ -1,6 +1,5 @@
-OUTPUT_DIR: "./output_caffe"
 MODEL:
-  WEIGHTS: "R_101_detectron2.pth"
+  WEIGHTS: "bua-caffe-FRCN-R101.pth"
   META_ARCHITECTURE: "GeneralizedBUARCNN"
   PIXEL_MEAN: [102.9801, 115.9465, 122.7717]
   ANCHOR_GENERATOR:
@@ -10,7 +9,7 @@ MODEL:
     MIN_SIZE: 16
   BUA:
     ATTRIBUTE_ON: False
-    EXTRACT_FEATS: False
+    EXTRACT_FEATS: True
     RPN:
       CONV_OUT_CHANNELS: 512
   RESNETS:
@@ -40,11 +39,7 @@ MODEL:
     BBOX_REG_WEIGHTS: (1.0, 1.0, 1.0, 1.0)
 DATASETS:
   TRAIN: ("visual_genome_train",)
-  TEST: ("visual_genome_val",)
-#  TRAIN: ("coco_2014_train",)
-#  TEST: ("coco_2014_minival",)
-TEST:
-  DETECTIONS_PER_IMAGE: 400
+  TEST: ("coco_2014_val",)
 DATALOADER:
   NUM_WORKERS: 1
 SOLVER:

@@ -140,8 +140,7 @@ class GeneralizedBUARCNN(nn.Module):
                 height = input_per_image.get("height", image_size[0])
                 width = input_per_image.get("width", image_size[1])
                 if not self.bua_caffe:
-                    r = detector_postprocess(results_per_image, height, width)
-                    results_per_image = r
+                    results_per_image = detector_postprocess(results_per_image, height, width)
                 processed_results.append({"instances": results_per_image})
             return processed_results
         else:
