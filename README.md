@@ -71,9 +71,9 @@ To add:
 
 To add:
 
-1. ```--model```,e.g.```--model bua_caffe``` to assign a model for testing.
+1. ```--model```,e.g.```--model bua_caffe``` to assign a model for extracting.
 
-2. ```--config-file```,e.g.```--config-file configs/bua-caffe/test-bua-caffe-r101.yaml``` to import configuration file.
+2. ```--config-file```,e.g.```--config-file configs/bua-caffe/extract-bua-caffe-r101.yaml``` to import configuration file.
 
 3. ```--image_dir``` to assign image dir.
 
