@@ -36,17 +36,17 @@ Finally, the `datasets` folders will have the following structure:
 
 ```angular2html
 |-- datasets
-	|-- vg
-	|  |-- image
-    |  |  |-- VG_100K
-    |  |  |  |-- 2.jpg
-    |  |  |  |-- ...
-    |  |  |-- VG_100K_2
-    |  |  |  |-- 1.jpg
-    |  |  |  |-- ...
-	|  |-- annotations
-    |  |  |-- train.json
-    |  |  |-- val.json
+   |-- vg
+   |  |-- image
+   |  |  |-- VG_100K
+   |  |  |  |-- 2.jpg
+   |  |  |  |-- ...
+   |  |  |-- VG_100K_2
+   |  |  |  |-- 1.jpg
+   |  |  |  |-- ...
+   |  |-- annotations
+   |  |  |-- train.json
+   |  |  |-- val.json
 ```
 
 ## Test & Extract Feature
