@@ -63,7 +63,7 @@ To add:
 
 3. ```--eval-only``` to run eval only.
 
-4. ```--resume``` to start training with saved checkpoint parameters. 
+4. ```--resume``` to start testing with saved checkpoint parameters. 
 
 **Extract Feature:**
 
@@ -77,4 +77,4 @@ To add:
 
 3. ```--out_dir``` to assign output dir.
 
-4. ```--resume``` to start training with saved checkpoint parameters. 
+4. ```--resume``` to start extracting with saved checkpoint parameters. 
