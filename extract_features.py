@@ -83,10 +83,9 @@ def main():
     print('Number of images: {}.'.format(num_images))
     model.eval()
 
-    for im_file in imglist:
+    for im_file in tqdm.tqdm(imglist):
         im = cv2.imread(os.path.join(args.image_dir, im_file))
         dataset_dict = get_image_blob(im)
-        # assert len(im_scales) == 1, 'Only single-image batch is implemented'
 
         with torch.set_grad_enabled(False):
             boxes, scores, features_pooled = model([dataset_dict])

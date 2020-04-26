@@ -69,7 +69,7 @@ To add:
 
 **Extract Feature:**
 
-```python extract_feature.py --mode caffe --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml --image_dir image_dir_path --out_dir out_dir_path --resume```
+```python extract_features.py --mode caffe --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml --image_dir image_dir_path --out_dir out_dir_path --resume```
 
 To add:
 
