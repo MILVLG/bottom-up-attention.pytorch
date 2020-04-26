@@ -59,7 +59,7 @@ Finally, the `datasets` folders will have the following structure:
 
 To add:
 
-1. ```--model```,e.g.```--model caffe``` to assign a mode for testing.
+1. ```--mode```,e.g.```--mode caffe``` to assign a mode for testing.
 
 2. ```--config-file```,e.g.```--config-file configs/bua-caffe/test-bua-caffe-r101.yaml``` to import configuration file.
 
