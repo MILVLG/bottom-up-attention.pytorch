@@ -9,7 +9,7 @@ This project not only transfored the bottom-up-attention models to the [Detectro
 **Requirements:**
 
 - CUDA 9.2
-- Pytorch==1.4.0
+- PyTorch==1.4.0
 - Python 3.6
 - opencv-python
 - Detectron2
