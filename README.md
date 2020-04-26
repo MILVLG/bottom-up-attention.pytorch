@@ -8,15 +8,17 @@ This project not only transfored the bottom-up-attention models to the [Detectro
 
 **Requirements:**
 
+- CUDA 9.2
+- Pytorch==1.4.0
 - Python 3.6
 - opencv-python
 - Detectron2
 
 **installation:**
 
-1. You need to install detectron2 according to the [installation instructions](https://github.com/facebookresearch/detectron2/blob/master/INSTALL.md)
+1. You need to install detectron2 according to the [installation instructions](https://github.com/facebookresearch/detectron2/blob/5e2a6f62ef752c8b8c700d2e58405e4bede3ddbe/INSTALL.md)
 
-2. ```python setup.py build_ext```
+2. ```python setup.py build develop```
 
 ## Pretrained models
 
@@ -71,7 +73,7 @@ To add:
 
 To add:
 
-1. ```--model```,e.g.```--model bua_caffe``` to assign a model for extracting.
+1. ```--mode```,e.g.```--mode caffe``` to assign a model for extracting.
 
 2. ```--config-file```,e.g.```--config-file configs/bua-caffe/extract-bua-caffe-r101.yaml``` to import configuration file.
 

@@ -22,7 +22,7 @@ from detectron2.evaluation import COCOEvaluator, verify_results
 from utils.utils import mkdir, save_features
 from utils.extract_utils import get_image_blob
 from models import add_config
-from models.bua_caffe.layers.nms import nms
+from models.bua.layers.nms import nms
 
 def setup(args):
     """
