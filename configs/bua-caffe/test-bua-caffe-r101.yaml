@@ -1,5 +1,5 @@
 MODEL:
-  WEIGHTS: "bua-caffe-frcn-R101.pth"
+  WEIGHTS: "bua-caffe-frcn-r101.pth"
   META_ARCHITECTURE: "GeneralizedBUARCNN"
   PIXEL_MEAN: [102.9801, 115.9465, 122.7717]
   PROPOSAL_GENERATOR:

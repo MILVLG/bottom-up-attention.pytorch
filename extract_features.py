@@ -45,7 +45,7 @@ def main():
         help="path to config file",
     )
 
-    parser.add_argument("--model", default="bua_caffe", type=str, help="bua_caffe, ...")
+    parser.add_argument("--mode", default="caffe", type=str, help="bua_caffe, ...")
 
     parser.add_argument('--out_dir', dest='output_dir',
                         help='output directory for features',

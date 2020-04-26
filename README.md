@@ -18,7 +18,7 @@ This project not only transfored the bottom-up-attention models to the [Detectro
 
 1. You need to install detectron2 according to the [installation instructions](https://github.com/facebookresearch/detectron2/blob/5e2a6f62ef752c8b8c700d2e58405e4bede3ddbe/INSTALL.md)
 
-2. ```python setup.py build develop```
+2. Run setup.sh
 
 ## Pretrained models
 
@@ -55,11 +55,11 @@ Finally, the `datasets` folders will have the following structure:
 
 **Testing:**
 
-```python train_net.py --model bua_caffe --config-file configs/bua-caffe/test-bua-caffe-r101.yaml --eval-only --resume```
+```python train_net.py --mode caffe --config-file configs/bua-caffe/test-bua-caffe-r101.yaml --eval-only --resume```
 
 To add:
 
-1. ```--model```,e.g.```--model bua_caffe``` to assign a model for testing.
+1. ```--model```,e.g.```--model caffe``` to assign a mode for testing.
 
 2. ```--config-file```,e.g.```--config-file configs/bua-caffe/test-bua-caffe-r101.yaml``` to import configuration file.
 
@@ -69,11 +69,11 @@ To add:
 
 **Extract Feature:**
 
-```python extract_feature.py --model bua_caffe --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml --image_dir image_dir_path --out_dir out_dir_path --resume```
+```python extract_feature.py --mode caffe --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml --image_dir image_dir_path --out_dir out_dir_path --resume```
 
 To add:
 
-1. ```--mode```,e.g.```--mode caffe``` to assign a model for extracting.
+1. ```--mode```,e.g.```--mode caffe``` to assign a mode for extracting.
 
 2. ```--config-file```,e.g.```--config-file configs/bua-caffe/extract-bua-caffe-r101.yaml``` to import configuration file.
 

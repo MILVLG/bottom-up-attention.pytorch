@@ -9,7 +9,7 @@ def parse_opt():
         argparse.ArgumentParser:
     """
     parser = argparse.ArgumentParser(description="BottomUpAttention Training")
-    parser.add_argument("--model", default="bua_caffe", type=str, help="bua_caffe,...")
+    parser.add_argument("--mode", default="caffe", type=str, help="bua_caffe,...")
     parser.add_argument("--config-file", default="", metavar="FILE", help="path to config file")
     parser.add_argument(
         "--resume",
