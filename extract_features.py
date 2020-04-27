@@ -49,10 +49,10 @@ def main():
 
     parser.add_argument("--mode", default="caffe", type=str, help="bua_caffe, ...")
 
-    parser.add_argument('--out-dir', dest='output-dir',
+    parser.add_argument('--out-dir', dest='output_dir',
                         help='output directory for features',
                         default="features")
-    parser.add_argument('--image-dir', dest='image-dir',
+    parser.add_argument('--image-dir', dest='image_dir',
                         help='directory with images',
                         default="image")
     parser.add_argument(
@@ -111,19 +111,18 @@ def main():
             keep_boxes = torch.argsort(max_conf, descending=True)[:MAX_BOXES]
         image_feat = feats[keep_boxes]
         image_bboxes = dets[keep_boxes]
-        
+
         info = {
         'image_id': im_file.split('.')[0],
         'image_h': np.size(im, 0),
         'image_w': np.size(im, 1),
         'num_boxes': len(keep_boxes),
-        'boxes': base64.b64encode(image_bboxes),
-        'features': base64.b64encode(image_feat)
+        'boxes': base64.b64encode(image_bboxes.numpy()),
+        'features': base64.b64encode(image_feat.numpy())
         }  
 
         output_file = os.path.join(args.output_dir, im_file.split('.')[0])
         np.savez_compressed(output_file, x=image_feat, bbox=image_bboxes, num_bbox=len(keep_boxes), image_h=np.size(im, 0), image_w=np.size(im, 1), info=info) 
-
 
 if __name__ == "__main__":
     main()
