@@ -111,7 +111,7 @@ def main():
             keep_boxes = torch.argsort(max_conf, descending=True)[:MAX_BOXES]
         image_feat = feats[keep_boxes]
         image_bboxes = dets[keep_boxes]
-
+        
         info = {
         'image_id': im_file.split('.')[0],
         'image_h': np.size(im, 0),
@@ -122,7 +122,7 @@ def main():
         }  
 
         output_file = os.path.join(args.output_dir, im_file.split('.')[0])
-        np.savez_compressed(output_file_path, x=x, bbox=bbox, num_bbox=len(keep_boxes), image_h=np.size(im, 0), image_w=np.size(im, 1), info=info) 
+        np.savez_compressed(output_file, x=image_feat, bbox=image_bboxes, num_bbox=len(keep_boxes), image_h=np.size(im, 0), image_w=np.size(im, 1), info=info) 
 
 
 if __name__ == "__main__":
