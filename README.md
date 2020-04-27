@@ -11,8 +11,8 @@ We use [Detectron2](https://github.com/facebookresearch/detectron2) as the backe
 0. [Prerequisites](#Prerequisites)
 1. [Training](#Training)
 2. [Testing](#Testing)
-3. [Feature-Extraction](#Feature-Extraction)
-4. [Pre-trained-models](#Pre-trained-models)
+3. [Feature Extraction](#Feature-Extraction)
+4. [Pre-trained models](#Pre-trained-models)
 
 
 
