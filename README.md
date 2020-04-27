@@ -67,7 +67,7 @@ Finally, the `datasets` folders will have the following structure:
 
 ## Training
 
-The following script will train a bottom-up-attention model on the `train` split of VG:
+The following script will train a bottom-up-attention model on the `train` split of VG. *We are still working on this part to reproduce the same results as the Caffe version*. 
 
 ```bash
 $ python3 train_net.py --mode detectron2 \
