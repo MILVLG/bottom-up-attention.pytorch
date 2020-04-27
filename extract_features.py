@@ -10,6 +10,8 @@ import sys
 import torch
 import tqdm
 import cv2
+import numpy as np
+import base64
 sys.path.append('detectron2')
 
 import detectron2.utils.comm as comm
@@ -110,8 +112,17 @@ def main():
         image_feat = feats[keep_boxes]
         image_bboxes = dets[keep_boxes]
 
+        info = {
+        'image_id': im_file.split('.')[0],
+        'image_h': np.size(im, 0),
+        'image_w': np.size(im, 1),
+        'num_boxes': len(keep_boxes),
+        'boxes': base64.b64encode(image_bboxes),
+        'features': base64.b64encode(image_feat)
+        }  
+
         output_file = os.path.join(args.output_dir, im_file.split('.')[0])
-        save_features(output_file, image_feat.cpu(), image_bboxes.cpu())
+        np.savez_compressed(output_file_path, x=x, bbox=bbox, num_bbox=len(keep_boxes), image_h=np.size(im, 0), image_w=np.size(im, 1), info=info) 
 
 
 if __name__ == "__main__":
