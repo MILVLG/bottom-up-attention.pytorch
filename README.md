@@ -2,7 +2,7 @@
 
 This repository contains a **PyTorch** reimplementation of the [bottom-up-attention](https://github.com/peteanderson80/bottom-up-attention) project based on *Caffe*. 
 
-We use [Detectron2](https://github.com/facebookresearch/detectron2) as the backend to provide completed functions including training, testing and feature extraction. Furthermore, we migrate the pre-trained Caffe-based model from the original repository which obtains **the same visual features** as the original model (with deviation < 0.01). To the best of our knowledge, we are the first success attempt to migrate the pre-trained Caffe model. 
+We use [Detectron2](https://github.com/facebookresearch/detectron2) as the backend to provide completed functions including training, testing and feature extraction. Furthermore, we migrate the pre-trained Caffe-based model from the original repository which can extract **the same visual features** as the original model (with deviation < 0.01). To the best of our knowledge, this is the first success attempt to migrate the pre-trained Caffe model to PyTorch. 
 
 ## Table of Contents
 
@@ -36,6 +36,7 @@ Note that most of the requirements above are needed for Detectron2.
    $ cd apex
    $ python setup.py install
    $ cd ..
+   # install the rest
    $ python setup.py build develop
    ```
 
@@ -78,7 +79,7 @@ $ python3 train_net.py --mode detectron2 \
 
 2. `config-file` refers to all the configurations of the model.
 
-3. `resume` refers to a flag if you want to resume training from a specific checkpoint.
+3. `resume` refers to a flag if you want to resume training from a specific checkpoint. 
 
 ## Testing
 
@@ -94,9 +95,9 @@ $ python3 train_net.py --mode caffe \
 
 2. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
 
-3. `eval-only` refers to a flag if you want to testing only.
+3. `eval-only` refers to a flag to declare the testing phase.
 
-4. `resume` refers to a flag if you want to resume training from a specific checkpoint.
+4. `resume` refers to a flag to declare using the pre-trained model.
 
 ## Feature Extraction
 
@@ -116,7 +117,7 @@ $ python3 extract_feature.py --mode caffe \
 
 4. `out-dir` refers to the output feature directory.
 
-5. `resume` refers to a flag if you want to resume training from a specific checkpoint.
+5. `resume` refers to a flag to declare using the pre-trained model.
 
 ## Pre-trained models
 
