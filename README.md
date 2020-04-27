@@ -4,8 +4,6 @@ This repository contains a **PyTorch** reimplementation of the [bottom-up-attent
 
 We use [Detectron2](https://github.com/facebookresearch/detectron2) as the backend to provide completed functions including training, testing and feature extraction. Furthermore, we migrate the pre-trained Caffe-based model from the original repository which obtains **the same visual features** as the original model (with deviation < 0.01). To the best of our knowledge, we are the first success attempt to migrate the pre-trained Caffe model. 
 
-
-
 ## Table of Contents
 
 0. [Prerequisites](#Prerequisites)
@@ -13,8 +11,6 @@ We use [Detectron2](https://github.com/facebookresearch/detectron2) as the backe
 2. [Testing](#Testing)
 3. [Feature Extraction](#Feature-Extraction)
 4. [Pre-trained models](#Pre-trained-models)
-
-
 
 ## Prerequisites
 
@@ -96,8 +92,10 @@ $ python3 train_net.py --mode caffe \
 
 1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode.
 2. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
+3. `eval-only` refers to a flag if you testing only.
+4. `resume` refers to a flag if you want to resume training from a specific checkpoint.
 
-## Feature-Extraction
+## Feature Extraction
 
 Similar with the testing stage, the following script will extract the bottom-up-attention visual features with provided hyper-parameters:
 
@@ -111,8 +109,9 @@ $ python3 extract_feature.py --mode caffe \
 2. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
 3. `image-dir` refers to the input image directory.
 4. `out-dir` refers to the output feature directory. 
+5. `resume` refers to a flag if you want to resume training from a specific checkpoint.
 
-## Pre-trained-models
+## Pre-trained models
 
 We provided pre-trained models here. The evaluation metrics are exactly the same as those in the original Caffe project.
 
@@ -121,3 +120,11 @@ Currently we only provide the converted model from Caffe, which report exactly t
 Model  |  Backbone  | Objects mAP@0.5 |Objects weighted mAP@0.5|Download
 :-:|:-:|:-:|:-:|:-:
 Faster R-CNN （Caffe）|ResNet-101|10.2%|15.1%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaORTX7eenZOgGDjKe03e6UB31ty7Q2bkAN-LEKrqjSa6A?e=6iQGAj)
+
+## License
+
+This project is released under the [Apache 2.0 license](LICENSE).
+
+## Contact
+
+This repo is currently maintained by Jing Li ([@J1mL3e_](https://github.com/JimLee4530)) and Zhou Yu ([@yuzcccc](https://github.com/yuzcccc)).
