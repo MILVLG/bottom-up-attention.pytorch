@@ -111,14 +111,15 @@ def main():
             keep_boxes = torch.argsort(max_conf, descending=True)[:MAX_BOXES]
         image_feat = feats[keep_boxes]
         image_bboxes = dets[keep_boxes]
-
+        image_objects_conf = np.max(scores[keep_boxes].numpy(), axis=1)
+        image_objects = np.argmax(scores[keep_boxes].numpy(), axis=1)
         info = {
         'image_id': im_file.split('.')[0],
         'image_h': np.size(im, 0),
         'image_w': np.size(im, 1),
         'num_boxes': len(keep_boxes),
-        'boxes': base64.b64encode(image_bboxes.numpy()),
-        'features': base64.b64encode(image_feat.numpy())
+        'object': image_objects,
+        'object': image_objects_conf
         }  
 
         output_file = os.path.join(args.output_dir, im_file.split('.')[0])
