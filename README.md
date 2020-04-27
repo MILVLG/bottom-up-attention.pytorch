@@ -31,12 +31,14 @@ Note that most of the requirements above are needed for Detectron2.
 2. Compile other used tools using the following script:
 
    ```bash
+   # clone the repository
+   $ git clone --recursive https://github.com/MILVLG/bottom-up-attention.pytorch
    # install apex
    $ git clone https://github.com/NVIDIA/apex.git
    $ cd apex
    $ python setup.py install
    $ cd ..
-   # install the rest
+   # install the rest modules
    $ python setup.py build develop
    ```
 
