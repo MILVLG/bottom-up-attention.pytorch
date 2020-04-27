@@ -11,7 +11,6 @@ import torch
 import tqdm
 import cv2
 import numpy as np
-import base64
 sys.path.append('detectron2')
 
 import detectron2.utils.comm as comm
