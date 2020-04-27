@@ -118,8 +118,8 @@ def main():
         'image_h': np.size(im, 0),
         'image_w': np.size(im, 1),
         'num_boxes': len(keep_boxes),
-        'object': image_objects,
-        'object': image_objects_conf
+        'objects_id': image_objects,
+        'objects_conf': image_objects_conf
         }  
 
         output_file = os.path.join(args.output_dir, im_file.split('.')[0])
