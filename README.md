@@ -11,8 +11,8 @@ We use [Detectron2](https://github.com/facebookresearch/detectron2) as the backe
 0. [Prerequisites](#Prerequisites)
 1. [Training](#Training)
 2. [Testing](#Testing)
-3. [Feature Extraction](#Feature&nbsp；Extraction)
-4. [Pre-trained models](#Pre-trained&nbsp；models)
+3. [Feature-Extraction](#Feature-Extraction)
+4. [Pre-trained-models](#Pre-trained-models)
 
 
 
@@ -97,7 +97,7 @@ $ python3 train_net.py --mode caffe \
 1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode.
 2. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
 
-## Feature Extraction
+## Feature-Extraction
 
 Similar with the testing stage, the following script will extract the bottom-up-attention visual features with provided hyper-parameters:
 
@@ -112,7 +112,7 @@ $ python3 extract_feature.py --mode caffe \
 3. `image-dir` refers to the input image directory.
 4. `out-dir` refers to the output feature directory. 
 
-## Pre-trained models
+## Pre-trained-models
 
 We provided pre-trained models here. The evaluation metrics are exactly the same as those in the original Caffe project.
 
