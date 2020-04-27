@@ -47,10 +47,10 @@ def main():
 
     parser.add_argument("--mode", default="caffe", type=str, help="bua_caffe, ...")
 
-    parser.add_argument('--out_dir', dest='output_dir',
+    parser.add_argument('--out-dir', dest='output-dir',
                         help='output directory for features',
                         default="features")
-    parser.add_argument('--image_dir', dest='image_dir',
+    parser.add_argument('--image-dir', dest='image-dir',
                         help='directory with images',
                         default="image")
     parser.add_argument(
