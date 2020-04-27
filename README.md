@@ -92,7 +92,7 @@ $ python3 train_net.py --mode caffe \
 
 1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode.
 2. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
-3. `eval-only` refers to a flag if you testing only.
+3. `eval-only` refers to a flag if you want to testing only.
 4. `resume` refers to a flag if you want to resume training from a specific checkpoint.
 
 ## Feature Extraction
