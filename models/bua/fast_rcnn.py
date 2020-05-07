@@ -224,7 +224,7 @@ class BUACaffeFastRCNNOutputLayers(nn.Module):
       (2) classification scores
     """
 
-    def __init__(self, input_size, num_classes, cls_agnostic_bbox_reg, box_dim=4):
+    def __init__(self, input_size, num_classes, cls_agnostic_bbox_reg, box_dim=4, attr_on=False, num_attr_classes=401):
         """
         Args:
             input_size (int): channels, or (channels, height, width)
@@ -237,6 +237,7 @@ class BUACaffeFastRCNNOutputLayers(nn.Module):
 
         if not isinstance(input_size, int):
             input_size = np.prod(input_size)
+        self.attr_on = attr_on
 
         # The prediction layer for num_classes foreground classes and one background class
         # (hence + 1)
@@ -249,11 +250,38 @@ class BUACaffeFastRCNNOutputLayers(nn.Module):
         for l in [self.cls_score, self.bbox_pred]:
             nn.init.constant_(l.bias, 0)
 
+        if self.attr_on:
+            self.cls_embed = nn.Embedding(num_classes+1, 256)
+            self.attr_linear1 = nn.Linear(input_size + 256, 512)
+            self.attr_linear2 = nn.Linear(512, num_attr_classes)
+
+            nn.init.normal_(self.cls_embed.weight, std=0.01)
+            nn.init.normal_(self.attr_linear1.weight, std=0.01)
+            nn.init.normal_(self.attr_linear2.weight, std=0.01)
+            nn.init.constant_(self.attr_linear1.bias, 0)
+            nn.init.constant_(self.attr_linear2.bias, 0)
+
     def forward(self, x, proposal_boxes=None):
         if x.dim() > 2:
             x = torch.flatten(x, start_dim=1)
         scores = self.cls_score(x)
         proposal_deltas = self.bbox_pred(x)
+
+        if self.attr_on:
+            
+            # get labels and indices of proposals with foreground
+            all_labels = torch.argmax(scores, dim=1)
+
+            # get embeddings of indices using gt cls labels
+            cls_embed_out = self.cls_embed(all_labels)
+
+            # concat with fc7 feats
+            concat_attr = cat([x, cls_embed_out], dim=1)
+
+            # pass through attr head layers
+            fc_attr = self.attr_linear1(concat_attr)
+            attr_score =  F.softmax(self.attr_linear2(F.relu(fc_attr)), dim=-1)
+            return scores, proposal_deltas, attr_score
 
         return scores, proposal_deltas
 

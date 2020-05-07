@@ -124,8 +124,7 @@ class GeneralizedBUARCNN(nn.Module):
                 proposals = [x["proposals"].to(self.device) for x in batched_inputs]
 
             if self.extract_on:
-                boxes, scores, features_pooled = self.roi_heads(images, features, proposals, None)
-                return boxes, scores, features_pooled
+                return self.roi_heads(images, features, proposals, None)
             else:
                 results, _ = self.roi_heads(images, features, proposals, None)
         else:

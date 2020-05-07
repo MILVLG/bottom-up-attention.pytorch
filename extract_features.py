@@ -89,11 +89,16 @@ def main():
         dataset_dict = get_image_blob(im)
 
         with torch.set_grad_enabled(False):
-            boxes, scores, features_pooled = model([dataset_dict])
+            # boxes, scores, features_pooled = model([dataset_dict])
+            if cfg.MODEL.BUA.ATTRIBUTE_ON:
+                boxes, scores, features_pooled, attr_scores = model([dataset_dict])
+            else:
+                boxes, scores, features_pooled = model([dataset_dict])
 
         dets = boxes[0].tensor.cpu() / dataset_dict['im_scale']
         scores = scores[0].cpu()
         feats = features_pooled[0].cpu()
+
 
         max_conf = torch.zeros((scores.shape[0])).to(scores.device)
         for cls_ind in range(1, scores.shape[1]):
@@ -112,14 +117,29 @@ def main():
         image_bboxes = dets[keep_boxes]
         image_objects_conf = np.max(scores[keep_boxes].numpy(), axis=1)
         image_objects = np.argmax(scores[keep_boxes].numpy(), axis=1)
-        info = {
-        'image_id': im_file.split('.')[0],
-        'image_h': np.size(im, 0),
-        'image_w': np.size(im, 1),
-        'num_boxes': len(keep_boxes),
-        'objects_id': image_objects,
-        'objects_conf': image_objects_conf
-        }  
+        if cfg.MODEL.BUA.ATTRIBUTE_ON:
+            attr_scores = attr_scores[0].cpu()
+            image_attrs_conf = np.max(attr_scores[keep_boxes].numpy(), axis=1)
+            image_attrs = np.argmax(attr_scores[keep_boxes].numpy(), axis=1)
+            info = {
+            'image_id': im_file.split('.')[0],
+            'image_h': np.size(im, 0),
+            'image_w': np.size(im, 1),
+            'num_boxes': len(keep_boxes),
+            'objects_id': image_objects,
+            'objects_conf': image_objects_conf,
+            'attrs_id': image_attrs,
+            'attrs_conf': image_attrs_conf,
+            }
+        else:
+            info = {
+            'image_id': im_file.split('.')[0],
+            'image_h': np.size(im, 0),
+            'image_w': np.size(im, 1),
+            'num_boxes': len(keep_boxes),
+            'objects_id': image_objects,
+            'objects_conf': image_objects_conf
+            }
 
         output_file = os.path.join(args.output_dir, im_file.split('.')[0])
         np.savez_compressed(output_file, x=image_feat, bbox=image_bboxes, num_bbox=len(keep_boxes), image_h=np.size(im, 0), image_w=np.size(im, 1), info=info) 
