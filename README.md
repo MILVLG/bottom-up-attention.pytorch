@@ -4,6 +4,11 @@ This repository contains a **PyTorch** reimplementation of the [bottom-up-attent
 
 We use [Detectron2](https://github.com/facebookresearch/detectron2) as the backend to provide completed functions including training, testing and feature extraction. Furthermore, we migrate the pre-trained Caffe-based model from the original repository which obtains **the same visual features** as the original model (with deviation < 0.01). To the best of our knowledge, we are the first success attempt to migrate the pre-trained Caffe model. 
 
+Some example object and attribute predictions for salient image regions are illustrated below.
+
+![example-image1](datasets/demo/example_img1.png)
+![example-image2](datasets/demo/example_img2.png)
+
 ## Table of Contents
 
 0. [Prerequisites](#Prerequisites)
