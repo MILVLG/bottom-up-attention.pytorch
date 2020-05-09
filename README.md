@@ -6,8 +6,8 @@ We use [Detectron2](https://github.com/facebookresearch/detectron2) as the backe
 
 Some example object and attribute predictions for salient image regions are illustrated below.
 
-![example-image1](datasets/demo/example_img1.png)
-![example-image2](datasets/demo/example_img2.png)
+![example-image1](datasets/demo/example_img1.png?raw=true)
+![example-image2](datasets/demo/example_img2.png?raw=true)
 
 ## Table of Contents
 
