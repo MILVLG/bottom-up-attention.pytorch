@@ -1,5 +1,5 @@
 MODEL:
-  WEIGHTS: "bua-caffe-frcn-r101_with_attributes.pth"
+  WEIGHTS: "bua-caffe-frcn-r101_with_attributes_fix36.pth"
   META_ARCHITECTURE: "GeneralizedBUARCNN"
   PIXEL_MEAN: [102.9801, 115.9465, 122.7717]
   ANCHOR_GENERATOR:
@@ -54,4 +54,3 @@ INPUT:
   MAX_SIZE_TRAIN: 1000
   MIN_SIZE_TEST: 600
   MAX_SIZE_TEST: 1000
-

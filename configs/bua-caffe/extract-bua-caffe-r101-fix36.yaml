@@ -1,5 +1,5 @@
 MODEL:
-  WEIGHTS: "bua-caffe-frcn-r101_with_attributes.pth"
+  WEIGHTS: ""bua-caffe-frcn-r101_with_attributes.pth""
   META_ARCHITECTURE: "GeneralizedBUARCNN"
   PIXEL_MEAN: [102.9801, 115.9465, 122.7717]
   ANCHOR_GENERATOR:
@@ -8,8 +8,11 @@ MODEL:
     NAME: "BUARPN"
     MIN_SIZE: 16
   BUA:
-    ATTRIBUTE_ON: False
-    EXTRACT_FEATS: False
+    ATTRIBUTE_ON: True
+    EXTRACT_FEATS: True
+    EXTRACTOR:
+      MIN_BOXES: 36
+      MAX_BOXES: 36
     RPN:
       CONV_OUT_CHANNELS: 512
   RESNETS:
@@ -37,18 +40,6 @@ MODEL:
   ROI_BOX_HEAD:
     POOLER_TYPE: "ROIPool"
     BBOX_REG_WEIGHTS: (1.0, 1.0, 1.0, 1.0)
-DATASETS:
-  TRAIN: ("visual_genome_train",)
-  TEST: ("visual_genome_val",)
-TEST:
-  DETECTIONS_PER_IMAGE: 400
-DATALOADER:
-  NUM_WORKERS: 1
-SOLVER:
-  IMS_PER_BATCH: 1
-  BASE_LR: 0.02
-  STEPS: (60000, 80000)
-  MAX_ITER: 90000
 INPUT:
   MIN_SIZE_TRAIN: (600, )
   MAX_SIZE_TRAIN: 1000
