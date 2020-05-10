@@ -54,7 +54,9 @@ class BUACaffeRes5ROIHeads(ROIHeads):
         pooler_type           = cfg.MODEL.ROI_BOX_HEAD.POOLER_TYPE
         pooler_scales         = (1.0 / self.feature_strides[self.in_features[0]], )
         sampling_ratio        = cfg.MODEL.ROI_BOX_HEAD.POOLER_SAMPLING_RATIO
+        self.attr_on          = cfg.MODEL.BUA.ATTRIBUTE_ON
         self.extract_on       = cfg.MODEL.BUA.EXTRACT_FEATS
+        self.num_attr_classes = cfg.MODEL.BUA.ATTRIBUTE.NUM_CLASSES
 
         self.pooler = ROIPooler(
             output_size=pooler_resolution,
@@ -67,7 +69,7 @@ class BUACaffeRes5ROIHeads(ROIHeads):
 
         self.res5, out_channels = self._build_res5_block(cfg)
         self.box_predictor = BUACaffeFastRCNNOutputLayers(
-            out_channels, self.num_classes, self.cls_agnostic_bbox_reg
+            out_channels, self.num_classes, self.cls_agnostic_bbox_reg, attr_on=self.attr_on, num_attr_classes=self.num_attr_classes
         )
 
     def _build_res5_block(self, cfg):
@@ -117,7 +119,10 @@ class BUACaffeRes5ROIHeads(ROIHeads):
             [features[f] for f in self.in_features], proposal_boxes
         )
         feature_pooled = box_features.mean(dim=[2, 3])  # pooled to 1x1
-        pred_class_logits, pred_proposal_deltas = self.box_predictor(feature_pooled, proposals)
+        if self.attr_on:
+            pred_class_logits, pred_proposal_deltas, attr_scores = self.box_predictor(feature_pooled, proposals)
+        else:
+            pred_class_logits, pred_proposal_deltas = self.box_predictor(feature_pooled, proposals)
         if not self.extract_on:
             del feature_pooled
 
@@ -137,7 +142,10 @@ class BUACaffeRes5ROIHeads(ROIHeads):
         else:
             if self.extract_on:
                 num_preds_per_image = [len(p) for p in proposals]
-                return proposal_boxes, outputs.predict_probs(), feature_pooled.split(num_preds_per_image, dim=0)
+                if self.attr_on:
+                    return proposal_boxes, outputs.predict_probs(), feature_pooled.split(num_preds_per_image, dim=0), attr_scores.split(num_preds_per_image, dim=0)
+                else:
+                    return proposal_boxes, outputs.predict_probs(), feature_pooled.split(num_preds_per_image, dim=0)
             pred_instances, _ = outputs.inference(
                 self.test_score_thresh, self.test_nms_thresh, self.test_detections_per_img
             )

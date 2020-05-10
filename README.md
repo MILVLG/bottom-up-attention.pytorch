@@ -4,6 +4,11 @@ This repository contains a **PyTorch** reimplementation of the [bottom-up-attent
 
 We use [Detectron2](https://github.com/facebookresearch/detectron2) as the backend to provide completed functions including training, testing and feature extraction. Furthermore, we migrate the pre-trained Caffe-based model from the original repository which can extract **the same visual features** as the original model (with deviation < 0.01).
 
+Some example object and attribute predictions for salient image regions are illustrated below. The script to obtain the following visualizations can be found [here](utils/visualize.ipynb)
+
+![example-image1](datasets/demo/example_image1.png?raw=true)
+![example-image2](datasets/demo/example_image2.png?raw=true)
+
 ## Table of Contents
 
 0. [Prerequisites](#Prerequisites)
@@ -129,7 +134,8 @@ Currently we only provide the converted model from Caffe, which report exactly t
 
 Model  |  Backbone  | Objects mAP@0.5 |Objects weighted mAP@0.5|Download
 :-:|:-:|:-:|:-:|:-:
-Faster R-CNN （Caffe）|ResNet-101|10.2%|15.1%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaORTX7eenZOgGDjKe03e6UB31ty7Q2bkAN-LEKrqjSa6A?e=6iQGAj)
+Faster R-CNN (Caffe, K=[10,100])|ResNet-101|10.2%|15.1%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?e=SFMoeu)
+Faster R-CNN (Caffe, K=36)|ResNet-101|9.3%|14.0%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?e=kNB9pS)
 
 ## License
 
