@@ -111,7 +111,7 @@ $ python3 train_net.py --mode caffe \
 Similar with the testing stage, the following script will extract the bottom-up-attention visual features with provided hyper-parameters:
 
 ```bash
-$ python3 extract_feature.py --mode caffe \
+$ python3 extract_features.py --mode caffe \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --out-dir <out_dir> --resume
 ```
