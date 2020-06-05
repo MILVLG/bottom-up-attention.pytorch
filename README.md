@@ -46,6 +46,8 @@ Note that most of the requirements above are needed for Detectron2.
    # install the rest modules
    $ python setup.py build develop
    ```
+   
+**Note that using the latest version of Detectron2 may result in a running error. Please use the recommended version in this repository.** 
 
 #### Setup
 
