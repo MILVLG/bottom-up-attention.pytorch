@@ -2,6 +2,7 @@
 import logging, os
 import torch
 from torch import nn
+import torch.nn.functional as F
 
 from detectron2.structures import ImageList
 from detectron2.utils.logger import log_first_n
@@ -32,7 +33,9 @@ class GeneralizedBUARCNN(nn.Module):
 
         self.device = torch.device(cfg.MODEL.DEVICE)
         self.bua_caffe = cfg.MODEL.BUA.CAFFE
+        self.resnet_version = cfg.MODEL.BUA.RESNET_VERSION
         self.backbone = build_backbone(cfg)
+        self.in_features = cfg.MODEL.RPN.IN_FEATURES
         self.proposal_generator = build_proposal_generator(cfg, self.backbone.output_shape())
         self.roi_heads = build_roi_heads(cfg, self.backbone.output_shape())
 
@@ -80,6 +83,11 @@ class GeneralizedBUARCNN(nn.Module):
 
         features = self.backbone(images.tensor)
 
+        if self.resnet_version == 2:
+            for f in features:
+                out = self.roi_heads.res5[0].norm(features[f])
+                features[f] = F.relu_(out)
+
         if self.proposal_generator:
             proposals, proposal_losses = self.proposal_generator(images, features, gt_instances)
         else:
@@ -115,6 +123,11 @@ class GeneralizedBUARCNN(nn.Module):
 
         images = self.preprocess_image(batched_inputs)
         features = self.backbone(images.tensor)
+
+        if self.resnet_version == 2:
+            for f in features:
+                out = self.roi_heads.res5[0].norm(features[f])
+                features[f] = F.relu_(out)
 
         if detected_instances is None:
             if self.proposal_generator:

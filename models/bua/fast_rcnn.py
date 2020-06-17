@@ -251,7 +251,7 @@ class BUACaffeFastRCNNOutputLayers(nn.Module):
             nn.init.constant_(l.bias, 0)
 
         if self.attr_on:
-            self.cls_embed = nn.Embedding(num_classes+1, 256)
+            self.cls_embed = nn.Embedding(num_classes, 256)
             self.attr_linear1 = nn.Linear(input_size + 256, 512)
             self.attr_linear2 = nn.Linear(512, num_attr_classes)
 
@@ -557,7 +557,7 @@ class BUADetectron2FastRCNNOutputLayers(nn.Module):
             nn.init.constant_(l.bias, 0)
 
         if self.attr_on:
-            self.cls_embed = nn.Embedding(num_classes, 256)
+            self.cls_embed = nn.Embedding(num_classes+1, 256)
             self.attr_linear1 = nn.Linear(input_size + 256, 512)
             self.attr_linear2 = nn.Linear(512, num_attr_classes+1)
 
@@ -574,15 +574,20 @@ class BUADetectron2FastRCNNOutputLayers(nn.Module):
         proposal_deltas = self.bbox_pred(x)
 
         if self.attr_on:
-            assert proposal_boxes is not None, "Proposals are None while attr=True"
+            if self.training:
+                assert proposal_boxes is not None, "Proposals are None while attr=True"
 
-            # get labels and indices of proposals with foreground
-            all_labels = cat([prop.gt_classes for prop in proposal_boxes], dim=0)
-            fg_idx = all_labels < self.num_classes
-            fg_labels = all_labels[fg_idx]
-
-            # slice fc7 for those indices
-            fc7_fg = x[fg_idx]
+                # get labels and indices of proposals with foreground
+                all_labels = cat([prop.gt_classes for prop in proposal_boxes], dim=0)
+                fg_idx = all_labels < self.num_classes
+                fg_labels = all_labels[fg_idx]
+                # slice fc7 for those indices
+                fc7_fg = x[fg_idx]
+                
+            else:
+                # get labels and indices of proposals with foreground
+                fg_labels = torch.argmax(scores, dim=1)
+                fc7_fg = x
 
             # get embeddings of indices using gt cls labels
             cls_embed_out = self.cls_embed(fg_labels)
@@ -592,7 +597,7 @@ class BUADetectron2FastRCNNOutputLayers(nn.Module):
 
             # pass through attr head layers
             fc_attr = self.attr_linear1(concat_attr)
-            attr_score = F.relu(self.attr_linear2(fc_attr))
+            attr_score = self.attr_linear2(F.relu(fc_attr))
             return scores, proposal_deltas, attr_score
 
         return scores, proposal_deltas
