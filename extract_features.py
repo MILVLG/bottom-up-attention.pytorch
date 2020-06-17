@@ -70,9 +70,9 @@ def main():
 
     cfg = setup(args)
 
-    MIN_BOXES = 10
-    MAX_BOXES = 100
-    CONF_THRESH = 0.2
+    MIN_BOXES = cfg.MODEL.BUA.EXTRACTOR.MIN_BOXES
+    MAX_BOXES = cfg.MODEL.BUA.EXTRACTOR.MAX_BOXES
+    CONF_THRESH = cfg.MODEL.BUA.EXTRACTOR.CONF_THRESH
 
     model = DefaultTrainer.build_model(cfg)
     DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
@@ -86,7 +86,7 @@ def main():
 
     for im_file in tqdm.tqdm(imglist):
         im = cv2.imread(os.path.join(args.image_dir, im_file))
-        dataset_dict = get_image_blob(im)
+        dataset_dict = get_image_blob(im, cfg.MODEL.PIXEL_MEAN)
 
         with torch.set_grad_enabled(False):
             # boxes, scores, features_pooled = model([dataset_dict])
