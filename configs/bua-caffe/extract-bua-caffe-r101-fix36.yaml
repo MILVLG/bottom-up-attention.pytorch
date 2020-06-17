@@ -10,11 +10,11 @@ MODEL:
   BUA:
     ATTRIBUTE_ON: True
     EXTRACT_FEATS: True
+    RPN:
+      CONV_OUT_CHANNELS: 512
     EXTRACTOR:
       MIN_BOXES: 36
       MAX_BOXES: 36
-    RPN:
-      CONV_OUT_CHANNELS: 512
   RESNETS:
     DEPTH: 101
     OUT_FEATURES: ["res4"]

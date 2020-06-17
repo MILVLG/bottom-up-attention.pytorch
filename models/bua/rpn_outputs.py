@@ -83,13 +83,12 @@ def find_top_bua_rpn_proposals(
         keep = boxes.filter_boxes()
         boxes = boxes[keep]
         scores_per_img = scores_per_img[keep]
-        level_ids = level_ids[keep]
+        lvl = level_ids[keep]
 
         # filter empty boxes
         keep = boxes.nonempty(threshold=min_box_side_len*image_scales[n])
-        lvl = level_ids
         if keep.sum().item() != len(boxes):
-            boxes, scores_per_img, lvl = boxes[keep], scores_per_img[keep], level_ids[keep]
+            boxes, scores_per_img, lvl = boxes[keep], scores_per_img[keep], lvl[keep]
 
         # choose pre_nms_topk proposal
         Hi_Wi_A = scores_per_img.shape[0]
@@ -250,7 +249,7 @@ class BUARPNOutputs(object):
         """
         # Collect all objectness labels and delta targets over feature maps and images
         # The final ordering is L, N, H, W, A from slowest to fastest axis.
-        num_anchors_per_map = [np.prod(x.shape[1:]) for x in self.pred_objectness_logits]
+        num_anchors_per_map = [int(np.prod(x.shape[1:])/2) for x in self.pred_objectness_logits]
         num_anchors_per_image = sum(num_anchors_per_map)
 
         # Stack to: (N, num_anchors_per_image)
@@ -398,7 +397,7 @@ def bua_rpn_losses(
     valid_masks = gt_objectness_logits >= 0
     objectness_loss = F.cross_entropy(
         pred_objectness_logits[valid_masks],
-        gt_objectness_logits[valid_masks].to(torch.float32),
+        gt_objectness_logits[valid_masks].to(torch.long),
         reduction="sum",
     )
     return objectness_loss, localization_loss

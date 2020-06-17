@@ -12,6 +12,7 @@ def add_bottom_up_attention_config(cfg, caffe=False):
 
     _C.MODEL.BUA = CN()
     _C.MODEL.BUA.CAFFE = caffe
+    _C.MODEL.BUA.RESNET_VERSION = 1
     _C.MODEL.BUA.ATTRIBUTE_ON = False
     _C.MODEL.BUA.EXTRACT_FEATS = False
 
@@ -27,4 +28,4 @@ def add_bottom_up_attention_config(cfg, caffe=False):
     _C.MODEL.BUA.EXTRACTOR.OUTPUT_DIR = ".output/"
 
     _C.MODEL.BUA.ATTRIBUTE = CN()
-    _C.MODEL.BUA.ATTRIBUTE.NUM_CLASSES = 401
+    _C.MODEL.BUA.ATTRIBUTE.NUM_CLASSES = 400

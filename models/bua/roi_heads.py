@@ -3,6 +3,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
+from torch.nn import functional as F
 
 from detectron2.utils.events import get_event_storage
 from detectron2.modeling import ROI_HEADS_REGISTRY, ROIHeads
@@ -11,9 +12,11 @@ from detectron2.modeling.sampling import subsample_labels
 from detectron2.modeling.poolers import ROIPooler
 from detectron2.modeling.backbone.resnet import BottleneckBlock
 from detectron2.modeling.proposal_generator.proposal_utils import add_ground_truth_to_proposals
+from detectron2.layers import get_norm, BatchNorm2d
 
 from .fast_rcnn import BUACaffeFastRCNNOutputs, BUACaffeFastRCNNOutputLayers, BUADetection2FastRCNNOutputs, BUADetectron2FastRCNNOutputLayers
 from .box_regression import BUABox2BoxTransform
+from .backbone import BottleneckBlockv2
 
 def make_stage(block_class, num_blocks, first_stride, **kwargs):
     """
@@ -54,6 +57,7 @@ class BUACaffeRes5ROIHeads(ROIHeads):
         pooler_type           = cfg.MODEL.ROI_BOX_HEAD.POOLER_TYPE
         pooler_scales         = (1.0 / self.feature_strides[self.in_features[0]], )
         sampling_ratio        = cfg.MODEL.ROI_BOX_HEAD.POOLER_SAMPLING_RATIO
+        self.resnet_version   = cfg.MODEL.BUA.RESNET_VERSION
         self.attr_on          = cfg.MODEL.BUA.ATTRIBUTE_ON
         self.extract_on       = cfg.MODEL.BUA.EXTRACT_FEATS
         self.num_attr_classes = cfg.MODEL.BUA.ATTRIBUTE.NUM_CLASSES
@@ -68,6 +72,8 @@ class BUACaffeRes5ROIHeads(ROIHeads):
         self.box2box_transform = BUABox2BoxTransform(weights=cfg.MODEL.ROI_BOX_HEAD.BBOX_REG_WEIGHTS)
 
         self.res5, out_channels = self._build_res5_block(cfg)
+        if self.resnet_version == 2:
+            self.res5_bn = BatchNorm2d(out_channels, eps=2e-5)
         self.box_predictor = BUACaffeFastRCNNOutputLayers(
             out_channels, self.num_classes, self.cls_agnostic_bbox_reg, attr_on=self.attr_on, num_attr_classes=self.num_attr_classes
         )
@@ -86,7 +92,7 @@ class BUACaffeRes5ROIHeads(ROIHeads):
             "Deformable conv is not yet supported in res5 head."
         # fmt: on
         blocks = make_stage(
-            BottleneckBlock,
+            BottleneckBlock if self.resnet_version == 1 else BottleneckBlockv2,
             3,
             first_stride=2,
             in_channels=out_channels // 2,
@@ -101,6 +107,17 @@ class BUACaffeRes5ROIHeads(ROIHeads):
 
     def _shared_roi_transform(self, features, boxes):
         x = self.pooler(features, boxes)
+        if self.resnet_version == 2:
+            out = self.res5[0].conv1(x)
+            out = self.res5[0].conv2(out)
+            out = self.res5[0].conv3(out)
+            if self.res5[0].shortcut is not None:
+                shortcut = self.res5[0].shortcut(x)
+            else:
+                shortcut = x
+            out += shortcut
+            out = self.res5[1:](out)
+            return F.relu_(self.res5_bn(out))
         return self.res5(x)
 
     def forward(self, images, features, proposals, targets=None):
@@ -169,6 +186,7 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
         pooler_type           = cfg.MODEL.ROI_BOX_HEAD.POOLER_TYPE
         pooler_scales         = (1.0 / self.feature_strides[self.in_features[0]], )
         sampling_ratio        = cfg.MODEL.ROI_BOX_HEAD.POOLER_SAMPLING_RATIO
+        self.resnet_version   = cfg.MODEL.BUA.RESNET_VERSION
         self.attr_on          = cfg.MODEL.BUA.ATTRIBUTE_ON
         self.extract_on       = cfg.MODEL.BUA.EXTRACT_FEATS
         self.num_attr_classes = cfg.MODEL.BUA.ATTRIBUTE.NUM_CLASSES
@@ -183,6 +201,8 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
         # self.box2box_transform = BUABox2BoxTransform(weights=cfg.MODEL.ROI_BOX_HEAD.BBOX_REG_WEIGHTS)
 
         self.res5, out_channels = self._build_res5_block(cfg)
+        if self.resnet_version == 2:
+            self.res5_bn = BatchNorm2d(out_channels, eps=2e-5)
         self.box_predictor = BUADetectron2FastRCNNOutputLayers(
             out_channels, self.num_classes, self.cls_agnostic_bbox_reg, \
                 attr_on=self.attr_on, num_attr_classes=self.num_attr_classes
@@ -243,7 +263,7 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
         # fmt: on
 
         blocks = make_stage(
-            BottleneckBlock,
+            BottleneckBlock if self.resnet_version == 1 else BottleneckBlockv2,
             3,
             first_stride=2,
             in_channels=out_channels // 2,
@@ -258,6 +278,17 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
 
     def _shared_roi_transform(self, features, boxes):
         x = self.pooler(features, boxes)
+        if self.resnet_version == 2:
+            out = self.res5[0].conv1(x)
+            out = self.res5[0].conv2(out)
+            out = self.res5[0].conv3(out)
+            if self.res5[0].shortcut is not None:
+                shortcut = self.res5[0].shortcut(x)
+            else:
+                shortcut = x
+            out += shortcut
+            out = self.res5[1:](out)
+            return F.relu_(self.res5_bn(out))
         return self.res5(x)
 
     @torch.no_grad()
@@ -398,7 +429,7 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
         else:
             if self.extract_on:
                 num_preds_per_image = [len(p) for p in proposals]
-                return proposal_boxes, outputs.predict_probs(), feature_pooled.split(num_preds_per_image, dim=0)
+                return proposal_boxes, outputs.predict_probs(), feature_pooled.split(num_preds_per_image, dim=0), F.softmax(pred_attribute_logits, dim=-1).split(num_preds_per_image, dim=0)
             pred_instances, _ = outputs.inference(
                 self.test_score_thresh, self.test_nms_thresh, self.test_detections_per_img
             )
