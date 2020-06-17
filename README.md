@@ -108,7 +108,7 @@ $ python3 train_net.py --mode caffe \
 Similar with the testing stage, the following script will extract the bottom-up-attention visual features with provided hyper-parameters:
 
 ```bash
-$ python3 extract_feature.py --mode caffe \
+$ python3 extract_features.py --mode caffe \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --out-dir <out_dir> --resume
 ```
@@ -133,6 +133,7 @@ Model  |  Backbone  | Objects mAP@0.5 |Objects weighted mAP@0.5|Download
 :-:|:-:|:-:|:-:|:-:
 Faster R-CNN (Caffe, K=[10,100])|ResNet-101|10.2%|15.1%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?e=SFMoeu)
 Faster R-CNN (Caffe, K=36)|ResNet-101|9.3%|14.0%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?e=kNB9pS)
+Faster R-CNN (Caffe, K=[10,100])|ResNet-152|11.1%|15.7%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?e=rpM1a3)
 
 ## License
 
