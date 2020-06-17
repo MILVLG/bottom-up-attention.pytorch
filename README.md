@@ -129,11 +129,11 @@ We provided pre-trained models here. The evaluation metrics are exactly the same
 
 Currently we only provide the converted model from Caffe, which report exactly the same scores compared to the original version. More models will be continuously updated. 
 
-Model  |  Backbone  | Objects mAP@0.5 |Objects weighted mAP@0.5|Download
-:-:|:-:|:-:|:-:|:-:
-Faster R-CNN (Caffe, K=[10,100])|ResNet-101|10.2%|15.1%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?e=SFMoeu)
-Faster R-CNN (Caffe, K=36)|ResNet-101|9.3%|14.0%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?e=kNB9pS)
-Faster R-CNN (Caffe, K=[10,100])|ResNet-152|11.1%|15.7%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?e=rpM1a3)
+Model | Mode |  Backbone  | Objects mAP@0.5 |Objects weighted mAP@0.5|Download
+:-:|:-:|:-:|:-:|:-:|:-:
+[Faster R-CNN](./configs/bua-caffe/extract-bua-caffe-r101.yaml)|C, K=[10,100]|ResNet-101|10.2%|15.1%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?e=SFMoeu)
+[Faster R-CNN](./configs/bua-caffe/extract-bua-caffe-r101-fix36.yaml)|C, K=36|ResNet-101|9.3%|14.0%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?e=kNB9pS)
+[Faster R-CNN](./configs/bua-caffe/extract-bua-caffe-r152.yaml)|C, K=[10,100]|ResNet-152|11.1%|15.7%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?e=rpM1a3)
 
 ## License
 
