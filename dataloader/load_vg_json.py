@@ -152,13 +152,12 @@ Category ids in annotations are not in [1, #categories]! We'll apply a mapping f
 
             obj = {key: anno[key] for key in ann_keys if key in anno}
 
-            attributes = [-1 for _ in range(max_attributes_per_ins)]
             attr = anno.get("attribute", None)
             if attr:
                 attributes = [-1 for _ in range(max_attributes_per_ins)]
                 for idx, a in enumerate(attr):
-                    attributes[idx] = a
-            obj["attributes"] = attributes
+                    attributes[idx] = a - 1
+                obj["attributes"] = attributes
 
             segm = anno.get("segmentation", None)
             if segm:  # either list[list[float]] or dict(RLE)

@@ -233,13 +233,11 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
             gt_attributes = gt_attributes[matched_idxs, :]
             # Label unmatched proposals (0 label from matcher) as background (label=num_classes)
             gt_classes[matched_labels == 0] = self.num_classes
-            gt_attributes[matched_labels == 0] = -1
             # Label ignore proposals (-1 label)
             gt_classes[matched_labels == -1] = -1
-            gt_attributes[matched_labels == -1] = -1
         else:
             gt_classes = torch.zeros_like(matched_idxs) + self.num_classes
-            gt_clagt_attributes = -torch.ones_like(matched_idxs)
+            gt_clagt_attributes = -torch.ones((len(matched_idxs),16), dtype=torch.int64).cuda()
 
         sampled_fg_idxs, sampled_bg_idxs = subsample_labels(
             gt_classes, self.batch_size_per_image, self.positive_sample_fraction, self.num_classes
@@ -395,7 +393,7 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
         )
         feature_pooled = box_features.mean(dim=[2, 3])  # pooled to 1x1
         if self.attr_on:
-            pred_class_logits, pred_proposal_deltas, pred_attribute_logits = self.box_predictor(feature_pooled, proposals)
+            pred_class_logits, pred_proposal_deltas, pred_attribute_logits, gt_attributes = self.box_predictor(feature_pooled, proposals)
         else:
             pred_class_logits, pred_proposal_deltas = self.box_predictor(feature_pooled, proposals)
         if not self.extract_on:
@@ -411,6 +409,7 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
                 self.attr_on,
                 pred_attribute_logits=pred_attribute_logits,
                 num_attr_classes=self.num_attr_classes,
+                gt_attributes=gt_attributes,
             )
         else:
             outputs = BUADetection2FastRCNNOutputs(
