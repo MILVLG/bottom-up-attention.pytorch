@@ -139,8 +139,8 @@ python3 extract_features.py --mode caffe \
 
 # extract roi feature by gt-bbox:
 python3 extract_features.py --mode caffe \
-         --config-file configs/bua-caffe/extract-bua-caffe-r101-bbox-only.yaml \ 
-         --image-dir <image_dir> --gt-bbox-dir <out_dir> --out-dir <out_dir>  --resume
+         --config-file configs/bua-caffe/extract-bua-caffe-r101-gt-bbox.yaml \ 
+         --image-dir <image_dir> --gt-bbox-dir <bbox_dir> --out-dir <out_dir>  --resume
 
 ```
 
