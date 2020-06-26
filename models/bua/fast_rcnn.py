@@ -589,6 +589,6 @@ class BUADetectron2FastRCNNOutputLayers(nn.Module):
             # pass through attr head layers
             fc_attr = self.attr_linear1(concat_attr)
             attr_score = self.attr_linear2(F.relu(fc_attr))
-            return scores, proposal_deltas, attr_score, cat([p.gt_attributes for p in proposals], dim=0)
+            return scores, proposal_deltas, attr_score, cat([p.gt_attributes for p in proposals], dim=0) if self.training else None
 
         return scores, proposal_deltas

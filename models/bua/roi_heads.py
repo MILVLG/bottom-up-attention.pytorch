@@ -61,6 +61,7 @@ class BUACaffeRes5ROIHeads(ROIHeads):
         self.attr_on          = cfg.MODEL.BUA.ATTRIBUTE_ON
         self.extract_on       = cfg.MODEL.BUA.EXTRACT_FEATS
         self.num_attr_classes = cfg.MODEL.BUA.ATTRIBUTE.NUM_CLASSES
+        self.extractor_mode   = cfg.MODEL.BUA.EXTRACTOR.MODE
 
         self.pooler = ROIPooler(
             output_size=pooler_resolution,
@@ -159,10 +160,15 @@ class BUACaffeRes5ROIHeads(ROIHeads):
         else:
             if self.extract_on:
                 num_preds_per_image = [len(p) for p in proposals]
-                if self.attr_on:
-                    return proposal_boxes, outputs.predict_probs(), feature_pooled.split(num_preds_per_image, dim=0), attr_scores.split(num_preds_per_image, dim=0)
+                if self.extractor_mode == 1 or self.extractor_mode == 3:
+                    if self.attr_on:
+                        return proposal_boxes, outputs.predict_probs(), feature_pooled.split(num_preds_per_image, dim=0), attr_scores.split(num_preds_per_image, dim=0)
+                    else:
+                        return proposal_boxes, outputs.predict_probs(), feature_pooled.split(num_preds_per_image, dim=0)
+                elif self.extractor_mode == 2:
+                    return outputs.predict_boxes(), outputs.predict_probs()
                 else:
-                    return proposal_boxes, outputs.predict_probs(), feature_pooled.split(num_preds_per_image, dim=0)
+                    raise ValueError('BUA.EXTRATOR.MODE ERROR')
             pred_instances, _ = outputs.inference(
                 self.test_score_thresh, self.test_nms_thresh, self.test_detections_per_img
             )
@@ -190,6 +196,7 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
         self.attr_on          = cfg.MODEL.BUA.ATTRIBUTE_ON
         self.extract_on       = cfg.MODEL.BUA.EXTRACT_FEATS
         self.num_attr_classes = cfg.MODEL.BUA.ATTRIBUTE.NUM_CLASSES
+        self.extractor_mode   = cfg.MODEL.BUA.EXTRACTOR.MODE
 
         self.pooler = ROIPooler(
             output_size=pooler_resolution,
@@ -428,7 +435,15 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
         else:
             if self.extract_on:
                 num_preds_per_image = [len(p) for p in proposals]
-                return proposal_boxes, outputs.predict_probs(), feature_pooled.split(num_preds_per_image, dim=0), F.softmax(pred_attribute_logits, dim=-1).split(num_preds_per_image, dim=0)
+                if self.extractor_mode == 1 or self.extractor_mode == 3:
+                    if self.attr_on:
+                        return proposal_boxes, outputs.predict_probs(), feature_pooled.split(num_preds_per_image, dim=0), F.softmax(pred_attribute_logits, dim=-1).split(num_preds_per_image, dim=0)
+                    else:
+                        return proposal_boxes, outputs.predict_probs(), feature_pooled.split(num_preds_per_image, dim=0)
+                elif self.extractor_mode == 2:
+                    return outputs.predict_boxes(), outputs.predict_probs()
+                else:
+                    raise ValueError('BUA.EXTRATOR.MODE ERROR')
             pred_instances, _ = outputs.inference(
                 self.test_score_thresh, self.test_nms_thresh, self.test_detections_per_img
             )
