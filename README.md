@@ -129,20 +129,15 @@ $ python3 extract_features.py --mode caffe \
 
 5. `resume` refers to a flag to declare using the pre-trained model.
 
-For example:
+Moreover, we provide two optional modes for extracting visual features:
 
 ```bash
-# extract roi feature:
-$ python3 extract_features.py --mode caffe \
-         --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
-         --image-dir <image_dir> --out-dir <out_dir>  --resume
-
-# extract bbox:
+# extract bboxes only:
 $ python3 extract_features.py --mode caffe \
          --config-file configs/bua-caffe/extract-bua-caffe-r101-bbox-only.yaml \ 
          --image-dir <image_dir> --out-dir <out_dir>  --resume
 
-# extract roi feature by gt-bbox:
+# extract visual features with ground-truth (or pre-extracted) bboxes:
 $ python3 extract_features.py --mode caffe \
          --config-file configs/bua-caffe/extract-bua-caffe-r101-gt-bbox.yaml \ 
          --image-dir <image_dir> --gt-bbox-dir <bbox_dir> --out-dir <out_dir>  --resume
