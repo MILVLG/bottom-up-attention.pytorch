@@ -21,6 +21,10 @@ def add_bottom_up_attention_config(cfg, caffe=False):
     _C.MODEL.BUA.RPN.CONV_OUT_CHANNELS = 512
 
     _C.MODEL.BUA.EXTRACTOR = CN()
+
+    # EXTRACTOR.MODE {1: extract roi features, 2: extract bbox only ,3: extract roi features by gt_bbox}
+    _C.MODEL.BUA.EXTRACTOR.MODE = 1
+
     # config of postprocessing in extractor
     _C.MODEL.BUA.EXTRACTOR.MIN_BOXES = 10
     _C.MODEL.BUA.EXTRACTOR.MAX_BOXES = 100

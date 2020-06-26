@@ -61,8 +61,6 @@ def extractor_postprocess(boxes, scores, features_pooled, input_per_image, extra
         keep_boxes = torch.argsort(max_conf, descending=True)[:MIN_BOXES]
     elif len(keep_boxes) > MAX_BOXES:
         keep_boxes = torch.argsort(max_conf, descending=True)[:MAX_BOXES]
-        # keep_boxes = torch.argsort(max_conf, descending=True)[:100]
-        # feat_list.append(feats[i][keep_boxes])
     image_feat = features_pooled[keep_boxes]
     image_bboxes = dets[keep_boxes]
 

@@ -19,11 +19,12 @@ from detectron2.data import build_detection_test_loader, build_detection_train_l
 from detectron2.config import get_cfg
 from detectron2.engine import DefaultTrainer, default_setup, launch
 from detectron2.evaluation import COCOEvaluator, verify_results
+from detectron2.structures import Instances
 
 from utils.utils import mkdir, save_features
-from utils.extract_utils import get_image_blob
+from utils.extract_utils import get_image_blob, save_bbox, save_roi_features_by_gt_bbox, save_roi_features
 from models import add_config
-from models.bua.layers.nms import nms
+from models.bua.box_regression import BUABoxes
 
 def setup(args):
     """
@@ -54,6 +55,9 @@ def main():
     parser.add_argument('--image-dir', dest='image_dir',
                         help='directory with images',
                         default="image")
+    parser.add_argument('--gt-bbox-dir', dest='gt_bbox_dir',
+                        help='directory with gt-bbox',
+                        default="bbox")
     parser.add_argument(
         "--resume",
         action="store_true",
@@ -85,64 +89,45 @@ def main():
     model.eval()
 
     for im_file in tqdm.tqdm(imglist):
+        if os.path.exists(os.path.join(args.output_dir, im_file.split('.')[0]+'.npz')):
+            continue
         im = cv2.imread(os.path.join(args.image_dir, im_file))
+        if im is None:
+            print(os.path.join(args.image_dir, im_file), "is illegal!")
+            continue
         dataset_dict = get_image_blob(im, cfg.MODEL.PIXEL_MEAN)
+        # extract roi features
+        if cfg.MODEL.BUA.EXTRACTOR.MODE == 1:
+            attr_scores = None
+            with torch.set_grad_enabled(False):
+                if cfg.MODEL.BUA.ATTRIBUTE_ON:
+                    boxes, scores, features_pooled, attr_scores = model([dataset_dict])
+                else:
+                    boxes, scores, features_pooled = model([dataset_dict])
+            save_roi_features(args, cfg, im_file, im, dataset_dict, boxes, scores, features_pooled, attr_scores)
+            # extract bbox only
+        elif cfg.MODEL.BUA.EXTRACTOR.MODE == 2:
+            with torch.set_grad_enabled(False):
+                boxes, scores = model([dataset_dict])
+            save_bbox(args, cfg, im_file, im, dataset_dict, boxes, scores)
+            # extract roi features by gt bbox
+        elif cfg.MODEL.BUA.EXTRACTOR.MODE == 3:
+            if not os.path.exists(os.path.join(args.gt_bbox_dir, im_file.split('.')[0]+'.npz')):
+                continue
+            bbox = torch.from_numpy(np.load(os.path.join(args.gt_bbox_dir, im_file.split('.')[0]+'.npz'))['bbox']) * dataset_dict['im_scale']
+            proposals = Instances(dataset_dict['image'].shape[-2:])
+            proposals.proposal_boxes = BUABoxes(bbox)
+            dataset_dict['proposals'] = proposals
 
-        with torch.set_grad_enabled(False):
-            # boxes, scores, features_pooled = model([dataset_dict])
-            if cfg.MODEL.BUA.ATTRIBUTE_ON:
-                boxes, scores, features_pooled, attr_scores = model([dataset_dict])
-            else:
-                boxes, scores, features_pooled = model([dataset_dict])
+            attr_scores = None
+            with torch.set_grad_enabled(False):
+                if cfg.MODEL.BUA.ATTRIBUTE_ON:
+                    boxes, scores, features_pooled, attr_scores = model([dataset_dict])
+                else:
+                    boxes, scores, features_pooled = model([dataset_dict])
 
-        dets = boxes[0].tensor.cpu() / dataset_dict['im_scale']
-        scores = scores[0].cpu()
-        feats = features_pooled[0].cpu()
-
-
-        max_conf = torch.zeros((scores.shape[0])).to(scores.device)
-        for cls_ind in range(1, scores.shape[1]):
-                cls_scores = scores[:, cls_ind]
-                keep = nms(dets, cls_scores, 0.3)
-                max_conf[keep] = torch.where(cls_scores[keep] > max_conf[keep],
-                                             cls_scores[keep],
-                                             max_conf[keep])
-            
-        keep_boxes = torch.nonzero(max_conf >= CONF_THRESH).flatten()
-        if len(keep_boxes) < MIN_BOXES:
-            keep_boxes = torch.argsort(max_conf, descending=True)[:MIN_BOXES]
-        elif len(keep_boxes) > MAX_BOXES:
-            keep_boxes = torch.argsort(max_conf, descending=True)[:MAX_BOXES]
-        image_feat = feats[keep_boxes]
-        image_bboxes = dets[keep_boxes]
-        image_objects_conf = np.max(scores[keep_boxes].numpy(), axis=1)
-        image_objects = np.argmax(scores[keep_boxes].numpy(), axis=1)
-        if cfg.MODEL.BUA.ATTRIBUTE_ON:
-            attr_scores = attr_scores[0].cpu()
-            image_attrs_conf = np.max(attr_scores[keep_boxes].numpy(), axis=1)
-            image_attrs = np.argmax(attr_scores[keep_boxes].numpy(), axis=1)
-            info = {
-            'image_id': im_file.split('.')[0],
-            'image_h': np.size(im, 0),
-            'image_w': np.size(im, 1),
-            'num_boxes': len(keep_boxes),
-            'objects_id': image_objects,
-            'objects_conf': image_objects_conf,
-            'attrs_id': image_attrs,
-            'attrs_conf': image_attrs_conf,
-            }
-        else:
-            info = {
-            'image_id': im_file.split('.')[0],
-            'image_h': np.size(im, 0),
-            'image_w': np.size(im, 1),
-            'num_boxes': len(keep_boxes),
-            'objects_id': image_objects,
-            'objects_conf': image_objects_conf
-            }
-
-        output_file = os.path.join(args.output_dir, im_file.split('.')[0])
-        np.savez_compressed(output_file, x=image_feat, bbox=image_bboxes, num_bbox=len(keep_boxes), image_h=np.size(im, 0), image_w=np.size(im, 1), info=info) 
+            save_roi_features_by_gt_bbox(args, cfg, im_file, im, dataset_dict, boxes, scores, features_pooled, attr_scores)
+         
 
 if __name__ == "__main__":
     main()

@@ -6,8 +6,7 @@ We use [Detectron2](https://github.com/facebookresearch/detectron2) as the backe
 
 Some example object and attribute predictions for salient image regions are illustrated below. The script to obtain the following visualizations can be found [here](utils/visualize.ipynb)
 
-![example-image1](datasets/demo/example_image1.png?raw=true)
-![example-image2](datasets/demo/example_image2.png?raw=true)
+![example-image](datasets/demo/example_image.jpg?raw=true)
 
 ## Table of Contents
 
@@ -115,7 +114,7 @@ Similar with the testing stage, the following script will extract the bottom-up-
 ```bash
 $ python3 extract_features.py --mode caffe \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
-         --image-dir <image_dir> --out-dir <out_dir> --resume
+         --image-dir <image_dir> --gt-bbox-dir <out_dir> --out-dir <out_dir>  --resume
 ```
 
 1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode.
@@ -124,9 +123,31 @@ $ python3 extract_features.py --mode caffe \
 
 3. `image-dir` refers to the input image directory.
 
-4. `out-dir` refers to the output feature directory.
+4. `gt-bbox-dir` refers to the ground truth bbox directory.
+
+5. `out-dir` refers to the output feature directory.
 
 5. `resume` refers to a flag to declare using the pre-trained model.
+
+For example:
+
+```bash
+# extract roi feature:
+$ python3 extract_features.py --mode caffe \
+         --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
+         --image-dir <image_dir> --out-dir <out_dir>  --resume
+
+# extract bbox:
+$ python3 extract_features.py --mode caffe \
+         --config-file configs/bua-caffe/extract-bua-caffe-r101-bbox-only.yaml \ 
+         --image-dir <image_dir> --out-dir <out_dir>  --resume
+
+# extract roi feature by gt-bbox:
+$ python3 extract_features.py --mode caffe \
+         --config-file configs/bua-caffe/extract-bua-caffe-r101-gt-bbox.yaml \ 
+         --image-dir <image_dir> --gt-bbox-dir <bbox_dir> --out-dir <out_dir>  --resume
+
+```
 
 ## Pre-trained models
 

@@ -9,6 +9,7 @@ from torch.nn import functional as F
 from detectron2.layers import cat
 from detectron2.structures import Instances
 from detectron2.utils.events import get_event_storage
+from detectron2.modeling.roi_heads import select_foreground_proposals
 from detectron2.modeling.roi_heads.fast_rcnn import fast_rcnn_inference, fast_rcnn_inference_single_image, FastRCNNOutputs
 
 from .layers.nms import batched_nms
@@ -292,7 +293,7 @@ class BUADetection2FastRCNNOutputs(FastRCNNOutputs):
 
     def __init__(
             
-        self, box2box_transform, pred_class_logits, pred_proposal_deltas, proposals, smooth_l1_beta, attr_on, pred_attribute_logits=None, num_attr_classes=400
+        self, box2box_transform, pred_class_logits, pred_proposal_deltas, proposals, smooth_l1_beta, attr_on=False, pred_attribute_logits=None, num_attr_classes=400, gt_attributes=None
     ):
         """
         Args:
@@ -325,6 +326,7 @@ class BUADetection2FastRCNNOutputs(FastRCNNOutputs):
 
         if self.attr_on:
             self.pred_attribute_logits = pred_attribute_logits
+            self.gt_attributes = gt_attributes
         self.smooth_l1_beta = smooth_l1_beta
 
         box_type = type(proposals[0].proposal_boxes)
@@ -339,8 +341,6 @@ class BUADetection2FastRCNNOutputs(FastRCNNOutputs):
             self.gt_boxes = box_type.cat([p.gt_boxes for p in proposals])
             assert proposals[0].has("gt_classes")
             self.gt_classes = cat([p.gt_classes for p in proposals], dim=0)
-            assert proposals[0].has("gt_attributes")
-            self.gt_attributes = cat([p.gt_attributes for p in proposals], dim=0)
 
     def _log_accuracy(self):
         """
@@ -432,15 +432,10 @@ class BUADetection2FastRCNNOutputs(FastRCNNOutputs):
         return loss_box_reg
 
     def attribute_loss(self):
-        # attributes = cat(self.gt_attributes)
-        bg_class_ind = self.pred_class_logits.shape[1] - 1
-        fg_inds = torch.nonzero((self.gt_classes >= 0) & (self.gt_classes < bg_class_ind)).squeeze(
-            1
-        )
-        fg_gt_attributes = self.gt_attributes[fg_inds]
+        fg_gt_attributes = self.gt_attributes
         n_boxes = self.pred_attribute_logits.shape[0]
         self.pred_attribute_logits = self.pred_attribute_logits.unsqueeze(1)
-        self.pred_attribute_logits = self.pred_attribute_logits.expand(n_boxes, 16, self.num_attr_classes+1).contiguous().view(-1, self.num_attr_classes+1)
+        self.pred_attribute_logits = self.pred_attribute_logits.expand(n_boxes, 16, self.num_attr_classes).contiguous().view(-1, self.num_attr_classes)
 
         inv_per_box_weights = (
             (fg_gt_attributes >= 0).sum(dim=1).repeat(16, 1).transpose(0, 1).flatten()
@@ -559,9 +554,9 @@ class BUADetectron2FastRCNNOutputLayers(nn.Module):
         if self.attr_on:
             self.cls_embed = nn.Embedding(num_classes+1, 256)
             self.attr_linear1 = nn.Linear(input_size + 256, 512)
-            self.attr_linear2 = nn.Linear(512, num_attr_classes+1)
+            self.attr_linear2 = nn.Linear(512, num_attr_classes)
 
-            nn.init.normal_(self.cls_embed.weight, std=0.01)
+            # nn.init.normal_(self.cls_embed.weight, std=0.01)
             nn.init.normal_(self.attr_linear1.weight, std=0.01)
             nn.init.normal_(self.attr_linear2.weight, std=0.01)
             nn.init.constant_(self.attr_linear1.bias, 0)
@@ -576,28 +571,24 @@ class BUADetectron2FastRCNNOutputLayers(nn.Module):
         if self.attr_on:
             if self.training:
                 assert proposal_boxes is not None, "Proposals are None while attr=True"
-
-                # get labels and indices of proposals with foreground
-                all_labels = cat([prop.gt_classes for prop in proposal_boxes], dim=0)
-                fg_idx = all_labels < self.num_classes
-                fg_labels = all_labels[fg_idx]
-                # slice fc7 for those indices
-                fc7_fg = x[fg_idx]
+                proposals, fg_selection_atrributes = select_foreground_proposals(proposal_boxes, self.num_classes)
+                attribute_features = x[torch.cat(fg_selection_atrributes, dim=0)]
+                cls_labels = torch.cat([prop.gt_classes for prop in proposals])
                 
             else:
                 # get labels and indices of proposals with foreground
-                fg_labels = torch.argmax(scores, dim=1)
-                fc7_fg = x
+                cls_labels = torch.argmax(scores, dim=1)
+                attribute_features = x
 
             # get embeddings of indices using gt cls labels
-            cls_embed_out = self.cls_embed(fg_labels)
+            cls_embed_out = self.cls_embed(cls_labels)
 
             # concat with fc7 feats
-            concat_attr = cat([fc7_fg, cls_embed_out], dim=1)
+            concat_attr = cat([attribute_features, cls_embed_out], dim=1)
 
             # pass through attr head layers
             fc_attr = self.attr_linear1(concat_attr)
             attr_score = self.attr_linear2(F.relu(fc_attr))
-            return scores, proposal_deltas, attr_score
+            return scores, proposal_deltas, attr_score, cat([p.gt_attributes for p in proposals], dim=0) if self.training else None
 
         return scores, proposal_deltas
