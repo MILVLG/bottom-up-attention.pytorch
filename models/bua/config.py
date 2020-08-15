@@ -32,4 +32,4 @@ def add_bottom_up_attention_config(cfg, caffe=False):
     _C.MODEL.BUA.EXTRACTOR.OUTPUT_DIR = ".output/"
 
     _C.MODEL.BUA.ATTRIBUTE = CN()
-    _C.MODEL.BUA.ATTRIBUTE.NUM_CLASSES = 400
+    _C.MODEL.BUA.ATTRIBUTE.NUM_CLASSES = 401
