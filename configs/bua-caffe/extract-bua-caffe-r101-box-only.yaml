@@ -16,6 +16,8 @@ MODEL:
       MIN_BOXES: 10
       MAX_BOXES: 100
       MODE: 2
+    ATTRIBUTE:
+      NUM_CLASSES: 401
   RESNETS:
     DEPTH: 101
     OUT_FEATURES: ["res4"]
