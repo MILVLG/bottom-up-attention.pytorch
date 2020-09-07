@@ -30,13 +30,17 @@ Note that most of the requirements above are needed for Detectron2.
 
 #### Installation
 
-1. Install Detectron2 according to their official instructions [here](https://github.com/facebookresearch/detectron2/blob/5e2a6f62ef752c8b8c700d2e58405e4bede3ddbe/INSTALL.md).
+1. Clone the project
+   ```bash
+   # clone the repository inclduing Detectron2(@5e2a6f6) 
+   $ git clone --recursive https://github.com/MILVLG/bottom-up-attention.pytorch
+   ```
+   
+2. Install Detectron2 according to their official instructions [here](https://github.com/facebookresearch/detectron2/blob/5e2a6f62ef752c8b8c700d2e58405e4bede3ddbe/INSTALL.md). **Please use the recommended version of Detectron2 in this repository. The latest version may result in a running error.** 
 
-2. Compile other used tools using the following script:
+3. Compile other used tools using the following script:
 
    ```bash
-   # clone the repository
-   $ git clone --recursive https://github.com/MILVLG/bottom-up-attention.pytorch
    # install apex
    $ git clone https://github.com/NVIDIA/apex.git
    $ cd apex
@@ -45,8 +49,6 @@ Note that most of the requirements above are needed for Detectron2.
    # install the rest modules
    $ python setup.py build develop
    ```
-   
-**Note that using the latest version of Detectron2 may result in a running error. Please use the recommended version in this repository.** 
 
 #### Setup
 
