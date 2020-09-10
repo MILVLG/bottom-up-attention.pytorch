@@ -66,9 +66,13 @@ def save_roi_features(args, cfg, im_file, im, dataset_dict, boxes, scores, featu
     feats = features_pooled[0].cpu()   
 
     max_conf = torch.zeros((scores.shape[0])).to(scores.device)
+    max_obj = torch.zeros((scores.shape[0]), dtype=torch.long).to(scores.device)
     for cls_ind in range(1, scores.shape[1]):
             cls_scores = scores[:, cls_ind]
             keep = nms(dets, cls_scores, 0.3)
+            max_obj[keep] = torch.where(cls_scores[keep] > max_conf[keep],
+                                             torch.tensor(cls_ind, dtype=torch.long),
+                                             max_obj[keep])
             max_conf[keep] = torch.where(cls_scores[keep] > max_conf[keep],
                                              cls_scores[keep],
                                              max_conf[keep])
@@ -80,8 +84,8 @@ def save_roi_features(args, cfg, im_file, im, dataset_dict, boxes, scores, featu
         keep_boxes = torch.argsort(max_conf, descending=True)[:MAX_BOXES]
     image_feat = feats[keep_boxes]
     image_bboxes = dets[keep_boxes]
-    image_objects_conf = np.max(scores[keep_boxes, 1:].numpy(), axis=1)
-    image_objects = np.argmax(scores[keep_boxes, 1:].numpy(), axis=1)
+    image_objects_conf = max_conf[keep_boxes].cpu().numpy()
+    image_objects = max_obj[keep_boxes].cpu().numpy()
     if not attr_scores is None:
         attr_scores = attr_scores[0].cpu()
         image_attrs_conf = np.max(attr_scores[keep_boxes].numpy(), axis=1)
