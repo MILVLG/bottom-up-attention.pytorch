@@ -80,12 +80,12 @@ def save_roi_features(args, cfg, im_file, im, dataset_dict, boxes, scores, featu
         keep_boxes = torch.argsort(max_conf, descending=True)[:MAX_BOXES]
     image_feat = feats[keep_boxes]
     image_bboxes = dets[keep_boxes]
-    image_objects_conf = np.max(scores[keep_boxes].numpy(), axis=1)
-    image_objects = np.argmax(scores[keep_boxes].numpy(), axis=1)
+    image_objects_conf = np.max(scores[keep_boxes].numpy()[:,1:], axis=1)
+    image_objects = np.argmax(scores[keep_boxes].numpy()[:,1:], axis=1)
     if not attr_scores is None:
         attr_scores = attr_scores[0].cpu()
-        image_attrs_conf = np.max(attr_scores[keep_boxes].numpy(), axis=1)
-        image_attrs = np.argmax(attr_scores[keep_boxes].numpy(), axis=1)
+        image_attrs_conf = np.max(attr_scores[keep_boxes].numpy()[:,1:], axis=1)
+        image_attrs = np.argmax(attr_scores[keep_boxes].numpy()[:,1:], axis=1)
         info = {
             'image_id': im_file.split('.')[0],
             'image_h': np.size(im, 0),
@@ -151,12 +151,12 @@ def save_roi_features_by_gt_bbox(args, cfg, im_file, im, dataset_dict, boxes, sc
 
     image_feat = feats[keep_boxes]
     image_bboxes = dets[keep_boxes]
-    image_objects_conf = np.max(scores[keep_boxes].numpy(), axis=1)
-    image_objects = np.argmax(scores[keep_boxes].numpy(), axis=1)
+    image_objects_conf = np.max(scores[keep_boxes].numpy()[:,1:], axis=1)
+    image_objects = np.argmax(scores[keep_boxes].numpy()[:,1:], axis=1)
     if not attr_scores is None:
         attr_scores = attr_scores[0].data.cpu()
-        image_attrs_conf = np.max(attr_scores[keep_boxes].numpy(), axis=1)
-        image_attrs = np.argmax(attr_scores[keep_boxes].numpy(), axis=1)
+        image_attrs_conf = np.max(attr_scores[keep_boxes].numpy()[:,1:], axis=1)
+        image_attrs = np.argmax(attr_scores[keep_boxes].numpy()[:,1:], axis=1)
         info = {
             'image_id': im_file.split('.')[0],
             'image_h': np.size(im, 0),
