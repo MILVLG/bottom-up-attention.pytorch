@@ -30,15 +30,20 @@ Note that most of the requirements above are needed for Detectron2.
 
 #### Installation
 
-1. Clone the project
+1. Clone the project inclduing the required version of Detectron2
    ```bash
    # clone the repository inclduing Detectron2(@5e2a6f6) 
    $ git clone --recursive https://github.com/MILVLG/bottom-up-attention.pytorch
    ```
    
-2. Install Detectron2 according to their official instructions [here](https://github.com/facebookresearch/detectron2/blob/5e2a6f62ef752c8b8c700d2e58405e4bede3ddbe/INSTALL.md). **Please use the recommended version of Detectron2 (@5e2a6f6), which can be downloaded using the above command. Using the latest version of Detectron may result in a running error.** 
+2. Install Detectron2
+   ```bash
+   $ cd detectron2
+   $ pip install -e .
+   ```
+**Note that the latest version of Detectron is incompatible with our project and may result in a running error. Please use the recommended version of Detectron2 (@5e2a6f6) which is downloaded in step 1.** 
 
-3. Compile other used tools using the following script:
+3. Compile the rest tools using the following script:
 
    ```bash
    # install apex
