@@ -36,7 +36,7 @@ Note that most of the requirements above are needed for Detectron2.
    $ git clone --recursive https://github.com/MILVLG/bottom-up-attention.pytorch
    ```
    
-2. Install Detectron2 according to their official instructions [here](https://github.com/facebookresearch/detectron2/blob/5e2a6f62ef752c8b8c700d2e58405e4bede3ddbe/INSTALL.md). **Please use the recommended version of Detectron2 in this repository. The latest version may result in a running error.** 
+2. Install Detectron2 according to their official instructions [here](https://github.com/facebookresearch/detectron2/blob/5e2a6f62ef752c8b8c700d2e58405e4bede3ddbe/INSTALL.md). **Please use the recommended version of Detectron2 (@5e2a6f6), which can be downloaded using the above command. Using the latest version of Detectron may result in a running error.** 
 
 3. Compile other used tools using the following script:
 
