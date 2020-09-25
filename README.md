@@ -41,7 +41,7 @@ Note that most of the requirements above are needed for Detectron2.
    $ cd detectron2
    $ pip install -e .
    ```
-**Note that the latest version of Detectron is incompatible with our project and may result in a running error. Please use the recommended version of Detectron2 (@5e2a6f6) which is downloaded in step 1.** 
+**Note that the latest version of Detectron2 is incompatible with our project and may result in a running error. Please use the recommended version of Detectron2 (@5e2a6f6) which is downloaded in step 1.** 
 
 3. Compile the rest tools using the following script:
 
