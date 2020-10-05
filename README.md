@@ -21,7 +21,7 @@ Some example object and attribute predictions for salient image regions are illu
 #### Requirements
 
 - [Python](https://www.python.org/downloads/) >= 3.6
-- [PyTorch](http://pytorch.org/) >= 1.4
+- [PyTorch](http://pytorch.org/) = 1.4
 - [Cuda](https://developer.nvidia.com/cuda-toolkit) >= 9.2 and [cuDNN](https://developer.nvidia.com/cudnn)
 - [Apex](https://github.com/NVIDIA/apex.git)
 - [Detectron2](https://github.com/facebookresearch/detectron2)
@@ -30,7 +30,7 @@ Note that most of the requirements above are needed for Detectron2.
 
 #### Installation
 
-1. Clone the project inclduing the required version of Detectron2
+1. Clone the project including the required version of Detectron2
    ```bash
    # clone the repository inclduing Detectron2(@5e2a6f6) 
    $ git clone --recursive https://github.com/MILVLG/bottom-up-attention.pytorch
