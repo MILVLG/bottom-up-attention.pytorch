@@ -152,14 +152,14 @@ Moreover, using the same pre-trained model, we provide a two-stage strategy for 
 # extract bboxes only:
 $ python3 extract_features.py --mode caffe \
          --num_cpus 32 --gpu '0,1,2,3' \
-         --extract_mode bboxes_only \
+         --extract_mode bboxes \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --out-dir <out_dir>  --resume 
 
 # extract visual features with the pre-extracted bboxes:
 $ python3 extract_features.py --mode caffe \
          --num_cpus 32 --gpu '0,1,2,3' \
-         --extract_mode pc_bboxes \
+         --extract_mode bbox_feats \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --bbox-dir <bbox_dir> --out-dir <out_dir>  --resume 
 
