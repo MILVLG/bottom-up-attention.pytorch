@@ -123,6 +123,7 @@ Similar with the testing stage, the following script will extract the bottom-up-
 ```bash
 $ python3 extract_features.py --mode caffe \
          --num_cpus 32 --gpu '0,1,2,3' \
+         --extract_mode roi_feats \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --bbox-dir <out_dir> --out-dir <out_dir>  --resume
 ```
@@ -135,13 +136,15 @@ $ python3 extract_features.py --mode caffe \
 
 4. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
 
-5. `image-dir` refers to the input image directory.
+5. `extract_mode` refers to the mode of extract features, including *roi_feats*, *bboxes_only* and *pc_bboxes*. 
 
-6. `bbox-dir` refers to the pre-proposed bbox directory.
+6. `image-dir` refers to the input image directory.
 
-7. `out-dir` refers to the output feature directory.
+7. `bbox-dir` refers to the pre-proposed bbox directory.
 
-8. `resume` refers to a flag to declare using the pre-trained model.
+8. `out-dir` refers to the output feature directory.
+
+9. `resume` refers to a flag to declare using the pre-trained model.
 
 Moreover, using the same pre-trained model, we provide a two-stage strategy for extracting visual features, which results in (slightly) more accurate visual features:
 
@@ -149,17 +152,16 @@ Moreover, using the same pre-trained model, we provide a two-stage strategy for 
 # extract bboxes only:
 $ python3 extract_features.py --mode caffe \
          --num_cpus 32 --gpu '0,1,2,3' \
+         --extract_mode bboxes_only \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
-         --image-dir <image_dir> --out-dir <out_dir>  --resume \
-         "MODEL.BUA.EXTRACTOR.MODE" 2
+         --image-dir <image_dir> --out-dir <out_dir>  --resume 
 
 # extract visual features with the pre-extracted bboxes:
 $ python3 extract_features.py --mode caffe \
          --num_cpus 32 --gpu '0,1,2,3' \
+         --extract_mode pc_bboxes \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
-         --image-dir <image_dir> --bbox-dir <bbox_dir> --out-dir <out_dir>  --resume \
-         "MODEL.BUA.EXTRACTOR.MODE" 3 \
-         "MODEL.PROPOSAL_GENERATOR.NAME" "PrecomputedProposals"
+         --image-dir <image_dir> --bbox-dir <bbox_dir> --out-dir <out_dir>  --resume 
 
 ```
 
