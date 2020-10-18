@@ -31,6 +31,17 @@ from models.bua.box_regression import BUABoxes
 import ray
 from ray.actor import ActorHandle
 
+def switch_extract_mode(mode):
+    if mode == 'roi_feats':
+        switch_cmd = ['MODEL.BUA.EXTRACTOR.MODE', 1]
+    elif mode == 'bboxes_only':
+        switch_cmd = ['MODEL.BUA.EXTRACTOR.MODE', 2]
+    elif mode == 'pc_bboxes':
+        switch_cmd = ['MODEL.BUA.EXTRACTOR.MODE', 3, 'MODEL.PROPOSAL_GENERATOR.NAME', 'PrecomputedProposals']
+    else:
+        print('Wrong extract mode! ')
+        exit()
+    return switch_cmd
 
 def setup(args):
     """
@@ -40,11 +51,10 @@ def setup(args):
     add_config(args, cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
+    cfg.merge_from_list(switch_extract_mode(args.extract_mode))
     cfg.freeze()
     default_setup(cfg, args)
     return cfg
-
-
 
 @ray.remote
 def generate_npz(extract_mode, pba: ActorHandle, *args):
@@ -72,10 +82,12 @@ def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
     generate_npz_list = []
     for im_file in (img_list):
         if os.path.exists(os.path.join(args.output_dir, im_file.split('.')[0]+'.npz')):
+            actor.update.remote(1)
             continue
         im = cv2.imread(os.path.join(args.image_dir, im_file))
         if im is None:
             print(os.path.join(args.image_dir, im_file), "is illegal!")
+            actor.update.remote(1)
             continue
         dataset_dict = get_image_blob(im, cfg.MODEL.PIXEL_MEAN)
         # extract roi features
@@ -106,6 +118,7 @@ def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
         # extract roi features by bbox
         elif cfg.MODEL.BUA.EXTRACTOR.MODE == 3:
             if not os.path.exists(os.path.join(args.bbox_dir, im_file.split('.')[0]+'.npz')):
+                actor.update.remote(1)
                 continue
             bbox = torch.from_numpy(np.load(os.path.join(args.bbox_dir, im_file.split('.')[0]+'.npz'))['bbox']) * dataset_dict['im_scale']
             proposals = Instances(dataset_dict['image'].shape[-2:])
@@ -146,6 +159,11 @@ def main():
                         default='0', type=str)
 
     parser.add_argument("--mode", default="caffe", type=str, help="bua_caffe, ...")
+
+    parser.add_argument('--extract_mode', default='roi_feats', type=str,
+                        help="'roi_feats', 'bboxes_only' and 'pc_bboxes' indicate \
+                        'extract roi features directly', 'extract bboxes only' and \
+                        'extract roi features with pre-computed bboxes' respectively")
 
     parser.add_argument('--out-dir', dest='output_dir',
                         help='output directory for features',
