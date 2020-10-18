@@ -56,14 +56,15 @@ def get_image_blob(im, pixel_means):
 
     return dataset_dict
 
+
 def save_roi_features(args, cfg, im_file, im, dataset_dict, boxes, scores, features_pooled, attr_scores=None):
     MIN_BOXES = cfg.MODEL.BUA.EXTRACTOR.MIN_BOXES
     MAX_BOXES = cfg.MODEL.BUA.EXTRACTOR.MAX_BOXES
     CONF_THRESH = cfg.MODEL.BUA.EXTRACTOR.CONF_THRESH
-
-    dets = boxes[0].tensor.cpu() / dataset_dict['im_scale']
-    scores = scores[0].cpu()
-    feats = features_pooled[0].cpu()   
+  
+    dets = boxes[0] / dataset_dict['im_scale']
+    scores = scores[0]
+    feats = features_pooled[0]
 
     max_conf = torch.zeros((scores.shape[0])).to(scores.device)
     for cls_ind in range(1, scores.shape[1]):
@@ -83,7 +84,7 @@ def save_roi_features(args, cfg, im_file, im, dataset_dict, boxes, scores, featu
     image_objects_conf = np.max(scores[keep_boxes].numpy()[:,1:], axis=1)
     image_objects = np.argmax(scores[keep_boxes].numpy()[:,1:], axis=1)
     if not attr_scores is None:
-        attr_scores = attr_scores[0].cpu()
+        attr_scores = attr_scores[0]
         image_attrs_conf = np.max(attr_scores[keep_boxes].numpy()[:,1:], axis=1)
         image_attrs = np.argmax(attr_scores[keep_boxes].numpy()[:,1:], axis=1)
         info = {
@@ -114,12 +115,12 @@ def save_bbox(args, cfg, im_file, im, dataset_dict, boxes, scores):
     MAX_BOXES = cfg.MODEL.BUA.EXTRACTOR.MAX_BOXES
     CONF_THRESH = cfg.MODEL.BUA.EXTRACTOR.CONF_THRESH
 
-    scores = scores[0].cpu()
+    scores = scores[0]
     boxes = boxes[0]
     num_classes = scores.shape[1]
     boxes = BUABoxes(boxes.reshape(-1, 4))
     boxes.clip((dataset_dict['image'].shape[1]/dataset_dict['im_scale'], dataset_dict['image'].shape[2]/dataset_dict['im_scale']))
-    boxes = boxes.tensor.view(-1, num_classes*4).cpu()  # R x C x 4
+    boxes = boxes.tensor.view(-1, num_classes*4)  # R x C x 4
 
     cls_boxes = torch.zeros((boxes.shape[0], 4))
     for idx in range(boxes.shape[0]):
@@ -140,13 +141,13 @@ def save_bbox(args, cfg, im_file, im, dataset_dict, boxes, scores):
     output_file = os.path.join(args.output_dir, im_file.split('.')[0])
     np.savez_compressed(output_file, bbox=image_bboxes, num_bbox=len(keep_boxes), image_h=np.size(im, 0), image_w=np.size(im, 1))
 
-def save_roi_features_by_gt_bbox(args, cfg, im_file, im, dataset_dict, boxes, scores, features_pooled, attr_scores=None):
+def save_roi_features_by_bbox(args, cfg, im_file, im, dataset_dict, boxes, scores, features_pooled, attr_scores=None):
     MIN_BOXES = cfg.MODEL.BUA.EXTRACTOR.MIN_BOXES
     MAX_BOXES = cfg.MODEL.BUA.EXTRACTOR.MAX_BOXES
     CONF_THRESH = cfg.MODEL.BUA.EXTRACTOR.CONF_THRESH
-    dets = boxes[0].tensor.cpu() / dataset_dict['im_scale']
-    scores = scores[0].cpu()
-    feats = features_pooled[0].cpu()
+    dets = boxes[0] / dataset_dict['im_scale']
+    scores = scores[0]
+    feats = features_pooled[0]
     keep_boxes = [i for i in range(scores.shape[0])]
 
     image_feat = feats[keep_boxes]
@@ -154,7 +155,7 @@ def save_roi_features_by_gt_bbox(args, cfg, im_file, im, dataset_dict, boxes, sc
     image_objects_conf = np.max(scores[keep_boxes].numpy()[:,1:], axis=1)
     image_objects = np.argmax(scores[keep_boxes].numpy()[:,1:], axis=1)
     if not attr_scores is None:
-        attr_scores = attr_scores[0].data.cpu()
+        attr_scores = attr_scores[0]
         image_attrs_conf = np.max(attr_scores[keep_boxes].numpy()[:,1:], axis=1)
         image_attrs = np.argmax(attr_scores[keep_boxes].numpy()[:,1:], axis=1)
         info = {

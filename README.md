@@ -25,12 +25,14 @@ Some example object and attribute predictions for salient image regions are illu
 - [Cuda](https://developer.nvidia.com/cuda-toolkit) >= 9.2 and [cuDNN](https://developer.nvidia.com/cudnn)
 - [Apex](https://github.com/NVIDIA/apex.git)
 - [Detectron2](https://github.com/facebookresearch/detectron2)
+- [Ray](https://github.com/ray-project/ray)
+- OpenCV
 
 Note that most of the requirements above are needed for Detectron2. 
 
 #### Installation
 
-1. Clone the project including the required version of Detectron2
+1. Clone the project inclduing the required version of Detectron2
    ```bash
    # clone the repository inclduing Detectron2(@5e2a6f6) 
    $ git clone --recursive https://github.com/MILVLG/bottom-up-attention.pytorch
@@ -120,36 +122,47 @@ Similar with the testing stage, the following script will extract the bottom-up-
 
 ```bash
 $ python3 extract_features.py --mode caffe \
+         --num_cpus 32 --gpu '0,1,2,3' \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
-         --image-dir <image_dir> --gt-bbox-dir <out_dir> --out-dir <out_dir>  --resume
+         --image-dir <image_dir> --bbox-dir <out_dir> --out-dir <out_dir>  --resume
 ```
 
 1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode.
 
-2. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
+2. `num_cpus` refers to the number of cpus to use for ray, and 0 stands for no limit. 
 
-3. `image-dir` refers to the input image directory.
+3. `gpu` refers to the ids of gpus to use. 
 
-4. `gt-bbox-dir` refers to the ground truth bbox directory.
+4. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
 
-5. `out-dir` refers to the output feature directory.
+5. `image-dir` refers to the input image directory.
 
-5. `resume` refers to a flag to declare using the pre-trained model.
+6. `bbox-dir` refers to the pre-proposed bbox directory.
+
+7. `out-dir` refers to the output feature directory.
+
+8. `resume` refers to a flag to declare using the pre-trained model.
 
 Moreover, using the same pre-trained model, we provide a two-stage strategy for extracting visual features, which results in (slightly) more accurate visual features:
 
 ```bash
 # extract bboxes only:
 $ python3 extract_features.py --mode caffe \
-         --config-file configs/bua-caffe/extract-bua-caffe-r101-bbox-only.yaml \ 
-         --image-dir <image_dir> --out-dir <out_dir>  --resume
+         --num_cpus 32 --gpu '0,1,2,3' \
+         --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
+         --image-dir <image_dir> --out-dir <out_dir>  --resume \
+         "MODEL.BUA.EXTRACTOR.MODE" 2
 
 # extract visual features with the pre-extracted bboxes:
 $ python3 extract_features.py --mode caffe \
-         --config-file configs/bua-caffe/extract-bua-caffe-r101-gt-bbox.yaml \ 
-         --image-dir <image_dir> --gt-bbox-dir <bbox_dir> --out-dir <out_dir>  --resume
+         --num_cpus 32 --gpu '0,1,2,3' \
+         --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
+         --image-dir <image_dir> --bbox-dir <bbox_dir> --out-dir <out_dir>  --resume \
+         "MODEL.BUA.EXTRACTOR.MODE" 3 \
+         "MODEL.PROPOSAL_GENERATOR.NAME" "PrecomputedProposals"
 
 ```
+
 
 ## Pre-trained models
 
@@ -157,10 +170,10 @@ We provided pre-trained models here. The evaluation metrics are exactly the same
 
 Model | Mode |  Backbone  | Objects mAP@0.5 |Objects weighted mAP@0.5|Download
 :-:|:-:|:-:|:-:|:-:|:-:
-[Faster R-CNN(k=36)](./configs/bua-caffe/extract-bua-caffe-r101-fix36.yaml)|Caffe|ResNet-101|9.3%|14.0%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?e=kNB9pS)
-[Faster R-CNN(k=[10,100])](./configs/bua-caffe/extract-bua-caffe-r101.yaml)|Caffe|ResNet-101|10.2%|15.1%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?e=SFMoeu)
-[Faster R-CNN(k=100)](./configs/bua-caffe/extract-bua-caffe-r152.yaml)|Caffe|ResNet-152|11.1%|15.7%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?e=rpM1a3)
- 
+[Faster R-CNN](./configs/bua-caffe/extract-bua-caffe-r101-fix36.yaml)|Caffe, K=36|ResNet-101|9.3%|14.0%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?e=kNB9pS)
+[Faster R-CNN](./configs/bua-caffe/extract-bua-caffe-r101.yaml)|Caffe, K=[10,100]|ResNet-101|10.2%|15.1%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?e=SFMoeu)
+[Faster R-CNN](./configs/bua-caffe/extract-bua-caffe-r152.yaml)|Caffe, K=100|ResNet-152|11.1%|15.7%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?e=rpM1a3)
+
 
 ## License
 

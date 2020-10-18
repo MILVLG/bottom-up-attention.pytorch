@@ -1,4 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+# pylint: disable=no-member
 """
 TridentNet Training Script.
 
@@ -8,7 +9,7 @@ import argparse
 import os
 import sys
 import torch
-import tqdm
+# import tqdm
 import cv2
 import numpy as np
 sys.path.append('detectron2')
@@ -22,9 +23,14 @@ from detectron2.evaluation import COCOEvaluator, verify_results
 from detectron2.structures import Instances
 
 from utils.utils import mkdir, save_features
-from utils.extract_utils import get_image_blob, save_bbox, save_roi_features_by_gt_bbox, save_roi_features
+from utils.extract_utils import get_image_blob, save_bbox, save_roi_features_by_bbox, save_roi_features
+from utils.progress_bar import ProgressBar
 from models import add_config
 from models.bua.box_regression import BUABoxes
+
+import ray
+from ray.actor import ActorHandle
+
 
 def setup(args):
     """
@@ -38,6 +44,92 @@ def setup(args):
     default_setup(cfg, args)
     return cfg
 
+
+
+@ray.remote
+def generate_npz(extract_mode, pba: ActorHandle, *args):
+    if extract_mode == 1:
+        save_roi_features(*args)
+    elif extract_mode == 2:
+        save_bbox(*args)
+    elif extract_mode == 3:
+        save_roi_features_by_bbox(*args)
+    else:
+        print('Invalid Extract Mode! ')
+    pba.update.remote(1)
+
+@ray.remote(num_gpus=1)
+def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
+    num_images = len(img_list)
+    print('Number of images on split{}: {}.'.format(split_idx, num_images))
+
+    model = DefaultTrainer.build_model(cfg)
+    DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
+        cfg.MODEL.WEIGHTS, resume=args.resume
+    )
+    model.eval()
+
+    generate_npz_list = []
+    for im_file in (img_list):
+        if os.path.exists(os.path.join(args.output_dir, im_file.split('.')[0]+'.npz')):
+            continue
+        im = cv2.imread(os.path.join(args.image_dir, im_file))
+        if im is None:
+            print(os.path.join(args.image_dir, im_file), "is illegal!")
+            continue
+        dataset_dict = get_image_blob(im, cfg.MODEL.PIXEL_MEAN)
+        # extract roi features
+        if cfg.MODEL.BUA.EXTRACTOR.MODE == 1:
+            attr_scores = None
+            with torch.set_grad_enabled(False):
+                if cfg.MODEL.BUA.ATTRIBUTE_ON:
+                    boxes, scores, features_pooled, attr_scores = model([dataset_dict])
+                else:
+                    boxes, scores, features_pooled = model([dataset_dict])
+            boxes = [box.tensor.cpu() for box in boxes]
+            scores = [score.cpu() for score in scores]
+            features_pooled = [feat.cpu() for feat in features_pooled]
+            if not attr_scores is None:
+                attr_scores = [attr_score.cpu() for attr_score in attr_scores]
+            generate_npz_list.append(generate_npz.remote(1, actor, 
+                args, cfg, im_file, im, dataset_dict, 
+                boxes, scores, features_pooled, attr_scores))
+        # extract bbox only
+        elif cfg.MODEL.BUA.EXTRACTOR.MODE == 2:
+            with torch.set_grad_enabled(False):
+                boxes, scores = model([dataset_dict])
+            boxes = [box.cpu() for box in boxes]
+            scores = [score.cpu() for score in scores]
+            generate_npz_list.append(generate_npz.remote(2, actor, 
+                args, cfg, im_file, im, dataset_dict, 
+                boxes, scores))
+        # extract roi features by bbox
+        elif cfg.MODEL.BUA.EXTRACTOR.MODE == 3:
+            if not os.path.exists(os.path.join(args.bbox_dir, im_file.split('.')[0]+'.npz')):
+                continue
+            bbox = torch.from_numpy(np.load(os.path.join(args.bbox_dir, im_file.split('.')[0]+'.npz'))['bbox']) * dataset_dict['im_scale']
+            proposals = Instances(dataset_dict['image'].shape[-2:])
+            proposals.proposal_boxes = BUABoxes(bbox)
+            dataset_dict['proposals'] = proposals
+
+            attr_scores = None
+            with torch.set_grad_enabled(False):
+                if cfg.MODEL.BUA.ATTRIBUTE_ON:
+                    boxes, scores, features_pooled, attr_scores = model([dataset_dict])
+                else:
+                    boxes, scores, features_pooled = model([dataset_dict])
+            boxes = [box.tensor.cpu() for box in boxes]
+            scores = [score.cpu() for score in scores]
+            features_pooled = [feat.cpu() for feat in features_pooled]
+            if not attr_scores is None:
+                attr_scores = [attr_score.data.cpu() for attr_score in attr_scores]
+            generate_npz_list.append(generate_npz.remote(3, actor, 
+                args, cfg, im_file, im, dataset_dict, 
+                boxes, scores, features_pooled, attr_scores))
+
+    ray.get(generate_npz_list)
+
+
 def main():
     parser = argparse.ArgumentParser(description="PyTorch Object Detection2 Inference")
     parser.add_argument(
@@ -47,6 +139,12 @@ def main():
         help="path to config file",
     )
 
+    parser.add_argument('--num_cpus', default=1, type=int, 
+                        help='number of cpus to use for ray, 0 means no limit')
+
+    parser.add_argument('--gpu', dest='gpu_id', help='GPU id(s) to use',
+                        default='0', type=str)
+
     parser.add_argument("--mode", default="caffe", type=str, help="bua_caffe, ...")
 
     parser.add_argument('--out-dir', dest='output_dir',
@@ -55,8 +153,8 @@ def main():
     parser.add_argument('--image-dir', dest='image_dir',
                         help='directory with images',
                         default="image")
-    parser.add_argument('--gt-bbox-dir', dest='gt_bbox_dir',
-                        help='directory with gt-bbox',
+    parser.add_argument('--bbox-dir', dest='bbox_dir',
+                        help='directory with bbox',
                         default="bbox")
     parser.add_argument(
         "--resume",
@@ -74,60 +172,35 @@ def main():
 
     cfg = setup(args)
 
+    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
+    num_gpus = len(args.gpu_id.split(','))
+
     MIN_BOXES = cfg.MODEL.BUA.EXTRACTOR.MIN_BOXES
     MAX_BOXES = cfg.MODEL.BUA.EXTRACTOR.MAX_BOXES
     CONF_THRESH = cfg.MODEL.BUA.EXTRACTOR.CONF_THRESH
 
-    model = DefaultTrainer.build_model(cfg)
-    DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
-        cfg.MODEL.WEIGHTS, resume=args.resume
-    )
     # Extract features.
     imglist = os.listdir(args.image_dir)
     num_images = len(imglist)
     print('Number of images: {}.'.format(num_images))
-    model.eval()
 
-    for im_file in tqdm.tqdm(imglist):
-        if os.path.exists(os.path.join(args.output_dir, im_file.split('.')[0]+'.npz')):
-            continue
-        im = cv2.imread(os.path.join(args.image_dir, im_file))
-        if im is None:
-            print(os.path.join(args.image_dir, im_file), "is illegal!")
-            continue
-        dataset_dict = get_image_blob(im, cfg.MODEL.PIXEL_MEAN)
-        # extract roi features
-        if cfg.MODEL.BUA.EXTRACTOR.MODE == 1:
-            attr_scores = None
-            with torch.set_grad_enabled(False):
-                if cfg.MODEL.BUA.ATTRIBUTE_ON:
-                    boxes, scores, features_pooled, attr_scores = model([dataset_dict])
-                else:
-                    boxes, scores, features_pooled = model([dataset_dict])
-            save_roi_features(args, cfg, im_file, im, dataset_dict, boxes, scores, features_pooled, attr_scores)
-            # extract bbox only
-        elif cfg.MODEL.BUA.EXTRACTOR.MODE == 2:
-            with torch.set_grad_enabled(False):
-                boxes, scores = model([dataset_dict])
-            save_bbox(args, cfg, im_file, im, dataset_dict, boxes, scores)
-            # extract roi features by gt bbox
-        elif cfg.MODEL.BUA.EXTRACTOR.MODE == 3:
-            if not os.path.exists(os.path.join(args.gt_bbox_dir, im_file.split('.')[0]+'.npz')):
-                continue
-            bbox = torch.from_numpy(np.load(os.path.join(args.gt_bbox_dir, im_file.split('.')[0]+'.npz'))['bbox']) * dataset_dict['im_scale']
-            proposals = Instances(dataset_dict['image'].shape[-2:])
-            proposals.proposal_boxes = BUABoxes(bbox)
-            dataset_dict['proposals'] = proposals
+    if args.num_cpus != 0:
+        ray.init(num_cpus=args.num_cpus)
+    else:
+        ray.init()
+    img_lists = [imglist[i::num_gpus] for i in range(num_gpus)]
 
-            attr_scores = None
-            with torch.set_grad_enabled(False):
-                if cfg.MODEL.BUA.ATTRIBUTE_ON:
-                    boxes, scores, features_pooled, attr_scores = model([dataset_dict])
-                else:
-                    boxes, scores, features_pooled = model([dataset_dict])
+    pb = ProgressBar(len(imglist))
+    actor = pb.actor
 
-            save_roi_features_by_gt_bbox(args, cfg, im_file, im, dataset_dict, boxes, scores, features_pooled, attr_scores)
-         
+    print('Number of GPUs: {}.'.format(num_gpus))
+    extract_feat_list = []
+    for i in range(num_gpus):
+        extract_feat_list.append(extract_feat.remote(i, img_lists[i], cfg, args, actor))
+    
+    pb.print_until_done()
+    ray.get(extract_feat_list)
+    ray.get(actor.get_counter.remote())
 
 if __name__ == "__main__":
     main()
