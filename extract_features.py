@@ -34,9 +34,9 @@ from ray.actor import ActorHandle
 def switch_extract_mode(mode):
     if mode == 'roi_feats':
         switch_cmd = ['MODEL.BUA.EXTRACTOR.MODE', 1]
-    elif mode == 'bboxes_only':
+    elif mode == 'bboxes':
         switch_cmd = ['MODEL.BUA.EXTRACTOR.MODE', 2]
-    elif mode == 'pc_bboxes':
+    elif mode == 'bbox_feats':
         switch_cmd = ['MODEL.BUA.EXTRACTOR.MODE', 3, 'MODEL.PROPOSAL_GENERATOR.NAME', 'PrecomputedProposals']
     else:
         print('Wrong extract mode! ')
@@ -155,13 +155,13 @@ def main():
     parser.add_argument('--num_cpus', default=1, type=int, 
                         help='number of cpus to use for ray, 0 means no limit')
 
-    parser.add_argument('--gpu', dest='gpu_id', help='GPU id(s) to use',
+    parser.add_argument('--gpus', dest='gpu_id', help='GPU id(s) to use',
                         default='0', type=str)
 
     parser.add_argument("--mode", default="caffe", type=str, help="bua_caffe, ...")
 
     parser.add_argument('--extract_mode', default='roi_feats', type=str,
-                        help="'roi_feats', 'bboxes_only' and 'pc_bboxes' indicate \
+                        help="'roi_feats', 'bboxes' and 'bbox_feats' indicates \
                         'extract roi features directly', 'extract bboxes only' and \
                         'extract roi features with pre-computed bboxes' respectively")
 

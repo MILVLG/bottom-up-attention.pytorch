@@ -122,7 +122,7 @@ Similar with the testing stage, the following script will extract the bottom-up-
 
 ```bash
 $ python3 extract_features.py --mode caffe \
-         --num_cpus 32 --gpu '0,1,2,3' \
+         --num_cpus 32 --gpus '0,1,2,3' \
          --extract_mode roi_feats \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --bbox-dir <out_dir> --out-dir <out_dir>  --resume
@@ -132,11 +132,11 @@ $ python3 extract_features.py --mode caffe \
 
 2. `num_cpus` refers to the number of cpus to use for ray, and 0 stands for no limit. 
 
-3. `gpu` refers to the ids of gpus to use. 
+3. `gpus` refers to the ids of gpus to use. 
 
 4. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
 
-5. `extract_mode` refers to the mode of extract features, including *roi_feats*, *bboxes_only* and *pc_bboxes*. 
+5. `extract_mode` refers to the mode of extract features, including {`roi_feats`, `bboxes` and `bbox_feats`}. 
 
 6. `image-dir` refers to the input image directory.
 
