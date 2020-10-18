@@ -43,6 +43,13 @@ def switch_extract_mode(mode):
         exit()
     return switch_cmd
 
+def set_min_max_boxes(min_max_boxes):
+    min_boxes = int(min_max_boxes.split(',')[0])
+    max_boxes = int(min_max_boxes.split(',')[1])
+    cmd = ['MODEL.BUA.EXTRACTOR.MIN_BOXES', min_boxes, 
+            'MODEL.BUA.EXTRACTOR.MAX_BOXES', max_boxes]
+    return cmd
+
 def setup(args):
     """
     Create configs and perform basic setups.
@@ -52,6 +59,7 @@ def setup(args):
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.merge_from_list(switch_extract_mode(args.extract_mode))
+    cfg.merge_from_list(set_min_max_boxes(args.min_max_boxes))
     cfg.freeze()
     default_setup(cfg, args)
     return cfg
@@ -152,7 +160,7 @@ def main():
         help="path to config file",
     )
 
-    parser.add_argument('--num_cpus', default=1, type=int, 
+    parser.add_argument('--num-cpus', default=1, type=int, 
                         help='number of cpus to use for ray, 0 means no limit')
 
     parser.add_argument('--gpus', dest='gpu_id', help='GPU id(s) to use',
@@ -160,10 +168,13 @@ def main():
 
     parser.add_argument("--mode", default="caffe", type=str, help="bua_caffe, ...")
 
-    parser.add_argument('--extract_mode', default='roi_feats', type=str,
+    parser.add_argument('--extract-mode', default='roi_feats', type=str,
                         help="'roi_feats', 'bboxes' and 'bbox_feats' indicates \
                         'extract roi features directly', 'extract bboxes only' and \
                         'extract roi features with pre-computed bboxes' respectively")
+
+    parser.add_argument('--min-max-boxes', default='10,100', type=str, 
+                        help='the number of min-max boxes of extractor')
 
     parser.add_argument('--out-dir', dest='output_dir',
                         help='output directory for features',

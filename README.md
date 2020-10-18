@@ -122,44 +122,49 @@ Similar with the testing stage, the following script will extract the bottom-up-
 
 ```bash
 $ python3 extract_features.py --mode caffe \
-         --num_cpus 32 --gpus '0,1,2,3' \
-         --extract_mode roi_feats \
+         --num-cpus 32 --gpus '0,1,2,3' \
+         --extract-mode roi_feats \
+         --min-max-boxes '10,100' \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --bbox-dir <out_dir> --out-dir <out_dir>  --resume
 ```
 
 1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode.
 
-2. `num_cpus` refers to the number of cpus to use for ray, and 0 stands for no limit. 
+2. `num-cpus` refers to the number of cpus to use for ray, and 0 stands for no limit. 
 
 3. `gpus` refers to the ids of gpus to use. 
 
 4. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
 
-5. `extract_mode` refers to the mode of extract features, including {`roi_feats`, `bboxes` and `bbox_feats`}. 
+5. `extract-mode` refers to the mode of extract features, including {`roi_feats`, `bboxes` and `bbox_feats`}. 
 
-6. `image-dir` refers to the input image directory.
+6. `min-max-boxes` refers to the number of min and max boxes of extractor. 
 
-7. `bbox-dir` refers to the pre-proposed bbox directory.
+7. `image-dir` refers to the input image directory.
 
-8. `out-dir` refers to the output feature directory.
+8. `bbox-dir` refers to the pre-proposed bbox directory.
 
-9. `resume` refers to a flag to declare using the pre-trained model.
+9. `out-dir` refers to the output feature directory.
+
+10. `resume` refers to a flag to declare using the pre-trained model.
 
 Moreover, using the same pre-trained model, we provide a two-stage strategy for extracting visual features, which results in (slightly) more accurate visual features:
 
 ```bash
 # extract bboxes only:
 $ python3 extract_features.py --mode caffe \
-         --num_cpus 32 --gpu '0,1,2,3' \
-         --extract_mode bboxes \
+         --num-cpus 32 --gpu '0,1,2,3' \
+         --extract-mode bboxes \
+         --min-max-boxes '10,100' \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --out-dir <out_dir>  --resume 
 
 # extract visual features with the pre-extracted bboxes:
 $ python3 extract_features.py --mode caffe \
-         --num_cpus 32 --gpu '0,1,2,3' \
-         --extract_mode bbox_feats \
+         --num-cpus 32 --gpu '0,1,2,3' \
+         --extract-mode bbox_feats \
+         --min-max-boxes '10,100' \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --bbox-dir <bbox_dir> --out-dir <out_dir>  --resume 
 
