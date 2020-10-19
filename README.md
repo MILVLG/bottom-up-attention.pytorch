@@ -118,7 +118,7 @@ $ python3 train_net.py --mode caffe \
 
 ## Feature Extraction
 
-Similar with the testing stage, the following script will extract the bottom-up-attention visual features in **an extremely fast manner!** with multi-process optimization (about 32 imgs/s on a workstation with 4 Titian-V GPUs and 32 cores)
+With highly-optimized multi-process parallelism, the following script will extract the bottom-up-attention visual features in **an extremely fast manner!** (about 32 imgs/s on a workstation with 4 Titian-V GPUs and 32 cores)
 
 ```bash
 $ python3 extract_features.py --mode caffe \
@@ -156,7 +156,6 @@ Using the same pre-trained model, we provide an alternative *two-stage* strategy
 $ python3 extract_features.py --mode caffe \
          --num-cpus 32 --gpu '0,1,2,3' \
          --extract-mode bboxes \
-         --min-max-boxes '10,100' \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --out-dir <out_dir>  --resume 
 
@@ -164,7 +163,6 @@ $ python3 extract_features.py --mode caffe \
 $ python3 extract_features.py --mode caffe \
          --num-cpus 32 --gpu '0,1,2,3' \
          --extract-mode bbox_feats \
-         --min-max-boxes '10,100' \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --bbox-dir <bbox_dir> --out-dir <out_dir>  --resume 
 
