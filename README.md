@@ -118,7 +118,7 @@ $ python3 train_net.py --mode caffe \
 
 ## Feature Extraction
 
-Similar with the testing stage, the following script will extract the bottom-up-attention visual features with provided hyper-parameters:
+With highly-optimized multi-process parallelism, the following script will extract the bottom-up-attention visual features in **an extremely fast manner!** (about 32 imgs/s on a workstation with 4 Titian-V GPUs and 32 cores)
 
 ```bash
 $ python3 extract_features.py --mode caffe \
@@ -131,15 +131,15 @@ $ python3 extract_features.py --mode caffe \
 
 1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode.
 
-2. `num-cpus` refers to the number of cpus to use for ray, and 0 stands for no limit. 
+2. `num-cpus` refers to the number of cpu cores to use for accelerating the cpu computation. **1** stands for using all possible cpus and **0** is the default value. 
 
-3. `gpus` refers to the ids of gpus to use. 
+3. `gpus` refers to the ids of gpus to use. **0** is the default value.
 
 4. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
 
-5. `extract-mode` refers to the mode of extract features, including {`roi_feats`, `bboxes` and `bbox_feats`}. 
+5. `extract-mode` refers to the modes for feature extraction, including {`roi_feats`, `bboxes` and `bbox_feats`}. 
 
-6. `min-max-boxes` refers to the number of min and max boxes of extractor. 
+6. `min-max-boxes` refers to the min-and-max number of features (boxes) to be extracted. 
 
 7. `image-dir` refers to the input image directory.
 
@@ -149,14 +149,13 @@ $ python3 extract_features.py --mode caffe \
 
 10. `resume` refers to a flag to declare using the pre-trained model.
 
-Moreover, using the same pre-trained model, we provide a two-stage strategy for extracting visual features, which results in (slightly) more accurate visual features:
+Using the same pre-trained model, we provide an alternative *two-stage* strategy for extracting visual features, which results in (slightly) more accurate bboxes and visual features:
 
 ```bash
 # extract bboxes only:
 $ python3 extract_features.py --mode caffe \
          --num-cpus 32 --gpu '0,1,2,3' \
          --extract-mode bboxes \
-         --min-max-boxes '10,100' \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --out-dir <out_dir>  --resume 
 
@@ -164,7 +163,6 @@ $ python3 extract_features.py --mode caffe \
 $ python3 extract_features.py --mode caffe \
          --num-cpus 32 --gpu '0,1,2,3' \
          --extract-mode bbox_feats \
-         --min-max-boxes '10,100' \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
          --image-dir <image_dir> --bbox-dir <bbox_dir> --out-dir <out_dir>  --resume 
 
@@ -173,13 +171,13 @@ $ python3 extract_features.py --mode caffe \
 
 ## Pre-trained models
 
-We provided pre-trained models here. The evaluation metrics are exactly the same as those in the original Caffe project. More models will be continuously updated. 
+We provided pre-trained models as follows, including the models converted from the original [Caffe repo](https://github.com/peteanderson80/bottom-up-attention) (the standard [dynamic 10-100 model](https://www.dropbox.com/s/5xethd2nxa8qrnq/resnet101_faster_rcnn_final.caffemodel?dl=1) and the alternative [fix36 model](https://www.dropbox.com/s/2h4hmgcvpaewizu/resnet101_faster_rcnn_final_iter_320000.caffemodel?dl=1)). The evaluation metrics are exactly the same as those in the original Caffe project. 
 
 Model | Mode |  Backbone  | Objects mAP@0.5 |Objects weighted mAP@0.5|Download
 :-:|:-:|:-:|:-:|:-:|:-:
-[Faster R-CNN](./configs/bua-caffe/extract-bua-caffe-r101-fix36.yaml)|Caffe, K=36|ResNet-101|9.3%|14.0%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?e=kNB9pS)
-[Faster R-CNN](./configs/bua-caffe/extract-bua-caffe-r101.yaml)|Caffe, K=[10,100]|ResNet-101|10.2%|15.1%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?e=SFMoeu)
-[Faster R-CNN](./configs/bua-caffe/extract-bua-caffe-r152.yaml)|Caffe, K=100|ResNet-152|11.1%|15.7%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?e=rpM1a3)
+[Faster R-CNN-k36](./configs/bua-caffe/extract-bua-caffe-r101-fix36.yaml)|Caffe|ResNet-101|9.3%|14.0%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?e=kNB9pS)
+[Faster R-CNN-k10-100](./configs/bua-caffe/extract-bua-caffe-r101.yaml)|Caffe|ResNet-101|10.2%|15.1%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?e=SFMoeu)
+[Faster R-CNN](./configs/bua-caffe/extract-bua-caffe-r152.yaml)|Caffe|ResNet-152|11.1%|15.7%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?e=rpM1a3)
 
 
 ## License
