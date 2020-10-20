@@ -44,7 +44,7 @@ def switch_extract_mode(mode):
     return switch_cmd
 
 def set_min_max_boxes(min_max_boxes):
-    if min_max_boxes == 'config_default':
+    if min_max_boxes == 'min_max_default':
         return []
     try:
         min_boxes = int(min_max_boxes.split(',')[0])
@@ -179,7 +179,7 @@ def main():
                         'extract roi features directly', 'extract bboxes only' and \
                         'extract roi features with pre-computed bboxes' respectively")
 
-    parser.add_argument('--min-max-boxes', default='config_default', type=str, 
+    parser.add_argument('--min-max-boxes', default='min_max_default', type=str, 
                         help='the number of min-max boxes of extractor')
 
     parser.add_argument('--out-dir', dest='output_dir',
