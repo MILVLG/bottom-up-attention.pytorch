@@ -131,9 +131,9 @@ $ python3 extract_features.py --mode caffe \
 
 1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode.
 
-2. `num-cpus` refers to the number of cpu cores to use for accelerating the cpu computation. **1** stands for using all possible cpus and **0** is the default value. 
+2. `num-cpus` refers to the number of cpu cores to use for accelerating the cpu computation. **0** stands for using all possible cpus and **1** is the default value. 
 
-3. `gpus` refers to the ids of gpus to use. **0** is the default value.
+3. `gpus` refers to the ids of gpus to use. **'0'** is the default value.
 
 4. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
 
