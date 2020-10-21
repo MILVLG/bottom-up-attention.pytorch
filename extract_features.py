@@ -44,8 +44,14 @@ def switch_extract_mode(mode):
     return switch_cmd
 
 def set_min_max_boxes(min_max_boxes):
-    min_boxes = int(min_max_boxes.split(',')[0])
-    max_boxes = int(min_max_boxes.split(',')[1])
+    if min_max_boxes == 'min_max_default':
+        return []
+    try:
+        min_boxes = int(min_max_boxes.split(',')[0])
+        max_boxes = int(min_max_boxes.split(',')[1])
+    except:
+        print('Illegal min-max boxes setting, using config default. ')
+        return []
     cmd = ['MODEL.BUA.EXTRACTOR.MIN_BOXES', min_boxes, 
             'MODEL.BUA.EXTRACTOR.MAX_BOXES', max_boxes]
     return cmd
@@ -173,7 +179,7 @@ def main():
                         'extract roi features directly', 'extract bboxes only' and \
                         'extract roi features with pre-computed bboxes' respectively")
 
-    parser.add_argument('--min-max-boxes', default='10,100', type=str, 
+    parser.add_argument('--min-max-boxes', default='min_max_default', type=str, 
                         help='the number of min-max boxes of extractor')
 
     parser.add_argument('--out-dir', dest='output_dir',
