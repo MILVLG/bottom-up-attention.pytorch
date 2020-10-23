@@ -26,7 +26,8 @@ Some example object and attribute predictions for salient image regions are illu
 - [Apex](https://github.com/NVIDIA/apex.git)
 - [Detectron2](https://github.com/facebookresearch/detectron2)
 - [Ray](https://github.com/ray-project/ray)
-- OpenCV
+- [OpenCV](https://opencv.org/)
+- [Pycocotools](https://github.com/cocodataset/cocoapi)
 
 Note that most of the requirements above are needed for Detectron2. 
 
@@ -129,7 +130,7 @@ $ python3 extract_features.py --mode caffe \
          --image-dir <image_dir> --bbox-dir <out_dir> --out-dir <out_dir>
 ```
 
-1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode. 'caffe' is the default value.
+1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode. `'caffe'` is the default value.
 
 2. `num-cpus` refers to the number of cpu cores to use for accelerating the cpu computation. **0** stands for using all possible cpus and **1** is the default value. 
 
@@ -143,7 +144,7 @@ $ python3 extract_features.py --mode caffe \
 
 7. `image-dir` refers to the input image directory.
 
-8. `bbox-dir` refers to the pre-proposed bbox directory. Only be used if the `extract-mode` is set to `bbox_feats`.
+8. `bbox-dir` refers to the pre-proposed bbox directory. Only be used if the `extract-mode` is set to `'bbox_feats'`.
 
 9. `out-dir` refers to the output feature directory.
 
@@ -184,4 +185,4 @@ This project is released under the [Apache 2.0 license](LICENSE).
 
 ## Contact
 
-This repo is currently maintained by Jing Li ([@J1mL3e_](https://github.com/JimLee4530)) and Zhou Yu ([@yuzcccc](https://github.com/yuzcccc)).
+This repo is currently maintained by Zhou Yu ([@yuzcccc](https://github.com/yuzcccc)), Tongan Luo ([@Zoroaster97](https://github.com/Zoroaster97)), and Jing Li ([@J1mL3e_](https://github.com/JimLee4530)).
