@@ -73,7 +73,7 @@ Finally, the `datasets` folders will have the following structure:
 ```angular2html
 |-- datasets
    |-- vg
-   |  |-- image
+   |  |-- images
    |  |  |-- VG_100K
    |  |  |  |-- 2.jpg
    |  |  |  |-- ...
