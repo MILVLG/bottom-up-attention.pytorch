@@ -70,8 +70,7 @@ def setup(args):
     default_setup(cfg, args)
     return cfg
 
-@ray.remote
-def generate_npz(extract_mode, pba: ActorHandle, *args):
+def generate_npz(extract_mode, *args):
     if extract_mode == 1:
         save_roi_features(*args)
     elif extract_mode == 2:
@@ -80,7 +79,6 @@ def generate_npz(extract_mode, pba: ActorHandle, *args):
         save_roi_features_by_bbox(*args)
     else:
         print('Invalid Extract Mode! ')
-    pba.update.remote(1)
 
 @ray.remote(num_gpus=1)
 def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
@@ -93,7 +91,6 @@ def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
     )
     model.eval()
 
-    generate_npz_list = []
     for im_file in (img_list):
         if os.path.exists(os.path.join(args.output_dir, im_file.split('.')[0]+'.npz')):
             actor.update.remote(1)
@@ -117,7 +114,7 @@ def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
             features_pooled = [feat.cpu() for feat in features_pooled]
             if not attr_scores is None:
                 attr_scores = [attr_score.cpu() for attr_score in attr_scores]
-            generate_npz_list.append(generate_npz.remote(1, actor, 
+            generate_npz(1, 
                 args, cfg, im_file, im, dataset_dict, 
                 boxes, scores, features_pooled, attr_scores))
         # extract bbox only
@@ -126,7 +123,7 @@ def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
                 boxes, scores = model([dataset_dict])
             boxes = [box.cpu() for box in boxes]
             scores = [score.cpu() for score in scores]
-            generate_npz_list.append(generate_npz.remote(2, actor, 
+            generate_npz(2,
                 args, cfg, im_file, im, dataset_dict, 
                 boxes, scores))
         # extract roi features by bbox
@@ -150,11 +147,11 @@ def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
             features_pooled = [feat.cpu() for feat in features_pooled]
             if not attr_scores is None:
                 attr_scores = [attr_score.data.cpu() for attr_score in attr_scores]
-            generate_npz_list.append(generate_npz.remote(3, actor, 
+            generate_npz(3, 
                 args, cfg, im_file, im, dataset_dict, 
                 boxes, scores, features_pooled, attr_scores))
 
-    ray.get(generate_npz_list)
+        actor.update.remote(1)
 
 
 def main():
