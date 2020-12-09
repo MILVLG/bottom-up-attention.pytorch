@@ -116,7 +116,7 @@ def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
                 attr_scores = [attr_score.cpu() for attr_score in attr_scores]
             generate_npz(1, 
                 args, cfg, im_file, im, dataset_dict, 
-                boxes, scores, features_pooled, attr_scores))
+                boxes, scores, features_pooled, attr_scores)
         # extract bbox only
         elif cfg.MODEL.BUA.EXTRACTOR.MODE == 2:
             with torch.set_grad_enabled(False):
@@ -125,7 +125,7 @@ def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
             scores = [score.cpu() for score in scores]
             generate_npz(2,
                 args, cfg, im_file, im, dataset_dict, 
-                boxes, scores))
+                boxes, scores)
         # extract roi features by bbox
         elif cfg.MODEL.BUA.EXTRACTOR.MODE == 3:
             if not os.path.exists(os.path.join(args.bbox_dir, im_file.split('.')[0]+'.npz')):
@@ -149,7 +149,7 @@ def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
                 attr_scores = [attr_score.data.cpu() for attr_score in attr_scores]
             generate_npz(3, 
                 args, cfg, im_file, im, dataset_dict, 
-                boxes, scores, features_pooled, attr_scores))
+                boxes, scores, features_pooled, attr_scores)
 
         actor.update.remote(1)
 
