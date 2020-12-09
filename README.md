@@ -26,7 +26,8 @@ Some example object and attribute predictions for salient image regions are illu
 - [Apex](https://github.com/NVIDIA/apex.git)
 - [Detectron2](https://github.com/facebookresearch/detectron2)
 - [Ray](https://github.com/ray-project/ray)
-- OpenCV
+- [OpenCV](https://opencv.org/)
+- [Pycocotools](https://github.com/cocodataset/cocoapi)
 
 Note that most of the requirements above are needed for Detectron2. 
 
@@ -42,6 +43,7 @@ Note that most of the requirements above are needed for Detectron2.
    ```bash
    $ cd detectron2
    $ pip install -e .
+   $ cd ..
    ```
 **Note that the latest version of Detectron2 is incompatible with our project and may result in a running error. Please use the recommended version of Detectron2 (@5e2a6f6) which is downloaded in step 1.** 
 
@@ -55,6 +57,7 @@ Note that most of the requirements above are needed for Detectron2.
    $ cd ..
    # install the rest modules
    $ python setup.py build develop
+   $ pip install opencv-python ray pycocotools
    ```
 
 #### Setup
@@ -70,7 +73,7 @@ Finally, the `datasets` folders will have the following structure:
 ```angular2html
 |-- datasets
    |-- vg
-   |  |-- image
+   |  |-- images
    |  |  |-- VG_100K
    |  |  |  |-- 2.jpg
    |  |  |  |-- ...
@@ -105,7 +108,7 @@ Given the trained model, the following script will test the performance on the `
 ```bash
 $ python3 train_net.py --mode caffe \
          --config-file configs/bua-caffe/test-bua-caffe-r101.yaml \ 
-         --eval-only --resume
+         --eval-only
 ```
 
 1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode.
@@ -113,8 +116,6 @@ $ python3 train_net.py --mode caffe \
 2. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
 
 3. `eval-only` refers to a flag to declare the testing phase.
-
-4. `resume` refers to a flag to declare using the pre-trained model.
 
 ## Feature Extraction
 
@@ -126,14 +127,14 @@ $ python3 extract_features.py --mode caffe \
          --extract-mode roi_feats \
          --min-max-boxes '10,100' \
          --config-file configs/bua-caffe/extract-bua-caffe-r101.yaml \ 
-         --image-dir <image_dir> --bbox-dir <out_dir> --out-dir <out_dir>  --resume
+         --image-dir <image_dir> --bbox-dir <out_dir> --out-dir <out_dir>
 ```
 
-1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode.
+1. `mode = {'caffe', 'detectron2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode. `'caffe'` is the default value.
 
-2. `num-cpus` refers to the number of cpu cores to use for accelerating the cpu computation. **1** stands for using all possible cpus and **0** is the default value. 
+2. `num-cpus` refers to the number of cpu cores to use for accelerating the cpu computation. **0** stands for using all possible cpus and **1** is the default value. 
 
-3. `gpus` refers to the ids of gpus to use. **0** is the default value.
+3. `gpus` refers to the ids of gpus to use. **'0'** is the default value.
 
 4. `config-file` refers to all the configurations of the model, which also include the path of the model weights. 
 
@@ -143,11 +144,9 @@ $ python3 extract_features.py --mode caffe \
 
 7. `image-dir` refers to the input image directory.
 
-8. `bbox-dir` refers to the pre-proposed bbox directory.
+8. `bbox-dir` refers to the pre-proposed bbox directory. Only be used if the `extract-mode` is set to `'bbox_feats'`.
 
 9. `out-dir` refers to the output feature directory.
-
-10. `resume` refers to a flag to declare using the pre-trained model.
 
 Using the same pre-trained model, we provide an alternative *two-stage* strategy for extracting visual features, which results in (slightly) more accurate bboxes and visual features:
 
@@ -186,4 +185,4 @@ This project is released under the [Apache 2.0 license](LICENSE).
 
 ## Contact
 
-This repo is currently maintained by Jing Li ([@J1mL3e_](https://github.com/JimLee4530)) and Zhou Yu ([@yuzcccc](https://github.com/yuzcccc)).
+This repo is currently maintained by Zhou Yu ([@yuzcccc](https://github.com/yuzcccc)), Tongan Luo ([@Zoroaster97](https://github.com/Zoroaster97)), and Jing Li ([@J1mL3e_](https://github.com/JimLee4530)).
