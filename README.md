@@ -167,7 +167,7 @@ $ python3 extract_features.py --mode caffe \
 
 ```
 
-And we also provide a faster version of the script of extract features, which will extract the bottom-up-attention visual features in **an extremely fast manner!** (about 16 imgs/s on a workstation with 4 Titian-V GPUs and 32 cores) However, it has a drawback that it could cause memory leakage problem when the computing capability of GPUs and CPUs is mismatched (More details and some matched examples in [here](https://github.com/MILVLG/bottom-up-attention.pytorch/pull/41)). 
+And we also provide a faster version of the script of extract features, which will extract the bottom-up-attention visual features in **an extremely fast manner!** (about 16 imgs/s on a workstation with 4 Titan-V GPUs and 32 cores) However, it has a drawback that it could cause memory leakage problem when the computing capability of GPUs and CPUs is mismatched (More details and some matched examples in [here](https://github.com/MILVLG/bottom-up-attention.pytorch/pull/41)). 
 
 To use this faster version, just replace 'extract_features.py' with 'extract_features_faster.py' in the above script. **MAKE SURE YOU HAVE ENOUGH CPUS.**
 
