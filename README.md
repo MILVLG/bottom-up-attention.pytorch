@@ -119,7 +119,11 @@ $ python3 train_net.py --mode caffe \
 
 ## Feature Extraction
 
-With highly-optimized multi-process parallelism, the following script will extract the bottom-up-attention visual features in a fast manner (about 7imgs/s on a workstation with 4 Titan-V GPUs and 32 CPU cores). 
+With highly-optimized multi-process parallelism, the following script will extract the bottom-up-attention visual features in a fast manner (about 7 imgs/s on a workstation with 4 Titan-V GPUs and 32 CPU cores). 
+
+And we also provide a faster version of the script of extract features, which will extract the bottom-up-attention visual features in **an extremely fast manner!** (about 16 imgs/s on a workstation with 4 Titan-V GPUs and 32 cores) However, it has a drawback that it could cause memory leakage problem when the computing capability of GPUs and CPUs is mismatched (More details and some matched examples in [here](https://github.com/MILVLG/bottom-up-attention.pytorch/pull/41)). 
+
+To use this faster version, just replace 'extract_features.py' with 'extract_features_faster.py' in the above script. **MAKE SURE YOU HAVE ENOUGH CPUS.**
 
 ```bash
 $ python3 extract_features.py --mode caffe \
@@ -166,10 +170,6 @@ $ python3 extract_features.py --mode caffe \
          --image-dir <image_dir> --bbox-dir <bbox_dir> --out-dir <out_dir>  --resume 
 
 ```
-
-And we also provide a faster version of the script of extract features, which will extract the bottom-up-attention visual features in **an extremely fast manner!** (about 16 imgs/s on a workstation with 4 Titan-V GPUs and 32 cores) However, it has a drawback that it could cause memory leakage problem when the computing capability of GPUs and CPUs is mismatched (More details and some matched examples in [here](https://github.com/MILVLG/bottom-up-attention.pytorch/pull/41)). 
-
-To use this faster version, just replace 'extract_features.py' with 'extract_features_faster.py' in the above script. **MAKE SURE YOU HAVE ENOUGH CPUS.**
 
 ## Pre-trained models
 
