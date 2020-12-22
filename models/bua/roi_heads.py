@@ -48,8 +48,13 @@ class BUACaffeRes5ROIHeads(ROIHeads):
     """
 
     def __init__(self, cfg, input_shape):
-        super().__init__(cfg, input_shape)
+        # super().__init__(cfg, input_shape)
+        super().__init__(cfg)
 
+        self.in_features = cfg.MODEL.ROI_HEADS.IN_FEATURES
+        self.feature_strides = {k: v.stride for k, v in input_shape.items()}
+        self.cls_agnostic_bbox_reg = cfg.MODEL.ROI_BOX_HEAD.CLS_AGNOSTIC_BBOX_REG
+        self.smooth_l1_beta = cfg.MODEL.ROI_BOX_HEAD.SMOOTH_L1_BETA
         assert len(self.in_features) == 1
 
         # fmt: off
@@ -183,8 +188,13 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
     """
 
     def __init__(self, cfg, input_shape):
-        super().__init__(cfg, input_shape)
+        # super().__init__(cfg, input_shape)
+        super().__init__(cfg)
 
+        self.in_features = cfg.MODEL.ROI_HEADS.IN_FEATURES
+        self.feature_strides = {k: v.stride for k, v in input_shape.items()}
+        self.cls_agnostic_bbox_reg = cfg.MODEL.ROI_BOX_HEAD.CLS_AGNOSTIC_BBOX_REG
+        self.smooth_l1_beta = cfg.MODEL.ROI_BOX_HEAD.SMOOTH_L1_BETA
         assert len(self.in_features) == 1
 
         # fmt: off
