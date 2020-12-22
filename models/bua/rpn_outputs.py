@@ -327,7 +327,8 @@ class BUARPNOutputs(object):
         """
         proposals = []
         # Transpose anchors from images-by-feature-maps (N, L) to feature-maps-by-images (L, N)
-        anchors = list(zip(*self.anchors))
+        # anchors = list(zip(*self.anchors))
+        anchors = list(zip(*[self.anchors]))
         # For each feature map
         for anchors_i, pred_anchor_deltas_i in zip(anchors, self.pred_anchor_deltas):
             B = anchors_i[0].tensor.size(1)

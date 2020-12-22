@@ -21,7 +21,7 @@ Some example object and attribute predictions for salient image regions are illu
 #### Requirements
 
 - [Python](https://www.python.org/downloads/) >= 3.6
-- [PyTorch](http://pytorch.org/) = 1.4
+- [PyTorch](http://pytorch.org/) >= 1.4
 - [Cuda](https://developer.nvidia.com/cuda-toolkit) >= 9.2 and [cuDNN](https://developer.nvidia.com/cudnn)
 - [Apex](https://github.com/NVIDIA/apex.git)
 - [Detectron2](https://github.com/facebookresearch/detectron2)
@@ -33,9 +33,9 @@ Note that most of the requirements above are needed for Detectron2.
 
 #### Installation
 
-1. Clone the project inclduing the required version of Detectron2
+1. Clone the project including the required version (v0.2.1) of Detectron2
    ```bash
-   # clone the repository inclduing Detectron2(@5e2a6f6) 
+   # clone the repository inclduing Detectron2(@be792b9) 
    $ git clone --recursive https://github.com/MILVLG/bottom-up-attention.pytorch
    ```
    
@@ -45,8 +45,10 @@ Note that most of the requirements above are needed for Detectron2.
    $ pip install -e .
    $ cd ..
    ```
-**Note that the latest version of Detectron2 is incompatible with our project and may result in a running error. Please use the recommended version of Detectron2 (@5e2a6f6) which is downloaded in step 1.** 
+**Note that the latest version (v0.3) of Detectron2 is not support Pytorch1.4. If you are using Pytorch1.4, please use the recommended version (v0.2.1) of Detectron2 (@be792b9) which is downloaded in step 1.**
 
+   Our project could also work well with the latest version (v0.3) of Detectron2 and Pytorch1.5. 
+   
 3. Compile the rest tools using the following script:
 
    ```bash
@@ -57,7 +59,7 @@ Note that most of the requirements above are needed for Detectron2.
    $ cd ..
    # install the rest modules
    $ python setup.py build develop
-   $ pip install opencv-python ray pycocotools
+   $ pip install ray
    ```
 
 #### Setup
