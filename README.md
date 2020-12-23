@@ -191,3 +191,15 @@ This project is released under the [Apache 2.0 license](LICENSE).
 ## Contact
 
 This repo is currently maintained by Zhou Yu ([@yuzcccc](https://github.com/yuzcccc)), Tongan Luo ([@Zoroaster97](https://github.com/Zoroaster97)), and Jing Li ([@J1mL3e_](https://github.com/JimLee4530)).
+
+## Citation
+
+If this repository is helpful for your research or you want to refer the provided pretrained models, you could cite the work using the following BibTeX entry:
+
+```
+@misc{yu2020buapt,
+  author = {Yu, Zhou and Li, Jing and Luo, Tongan and Yu, Jun},
+  title = {A PyTorch reimplementation of Bottom-Up-Attention},
+  howpublished = {\url{https://github.com/MILVLG/bottom-up-attention.pytorch}},
+  year = {2020}
+}
