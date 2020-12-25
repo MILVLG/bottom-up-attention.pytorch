@@ -197,7 +197,7 @@ If this repository is helpful for your research or you want to refer the provide
 ```
 @misc{yu2020buapt,
   author = {Yu, Zhou and Li, Jing and Luo, Tongan and Yu, Jun},
-  title = {A PyTorch reimplementation of Bottom-Up-Attention},
+  title = {A PyTorch Implementation of Bottom-Up-Attention},
   howpublished = {\url{https://github.com/MILVLG/bottom-up-attention.pytorch}},
   year = {2020}
 }
