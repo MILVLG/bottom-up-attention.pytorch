@@ -45,9 +45,7 @@ Note that most of the requirements above are needed for Detectron2.
    $ pip install -e .
    $ cd ..
    ```
-**Note that the latest version (v0.3) of Detectron2 is not support Pytorch1.4. If you are using Pytorch1.4, please use the recommended version (v0.2.1) of Detectron2 (@be792b9) which is downloaded in step 1.**
-
-   Our project could also work well with the latest version (v0.3) of Detectron2 and Pytorch1.5. 
+**We recommend using Detectron2 v0.2.1 (@be792b9) as backend for this project, which has been cloned in step 1. We believe a newer Detectron2 version is also compatible with this project unless their interface has been changed (we have tested v0.3 with PyTorch 1.5).**
    
 3. Compile the rest tools using the following script:
 
@@ -191,3 +189,15 @@ This project is released under the [Apache 2.0 license](LICENSE).
 ## Contact
 
 This repo is currently maintained by Zhou Yu ([@yuzcccc](https://github.com/yuzcccc)), Tongan Luo ([@Zoroaster97](https://github.com/Zoroaster97)), and Jing Li ([@J1mL3e_](https://github.com/JimLee4530)).
+
+## Citation
+
+If this repository is helpful for your research or you want to refer the provided pretrained models, you could cite the work using the following BibTeX entry:
+
+```
+@misc{yu2020buapt,
+  author = {Yu, Zhou and Li, Jing and Luo, Tongan and Yu, Jun},
+  title = {A PyTorch Implementation of Bottom-Up-Attention},
+  howpublished = {\url{https://github.com/MILVLG/bottom-up-attention.pytorch}},
+  year = {2020}
+}
