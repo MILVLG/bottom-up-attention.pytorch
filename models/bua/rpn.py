@@ -15,6 +15,8 @@ from .box_regression import BUABox2BoxTransform
 from detectron2.modeling.matcher import Matcher
 from .rpn_outputs import BUARPNOutputs, find_top_bua_rpn_proposals
 
+import copy
+
 @RPN_HEAD_REGISTRY.register()
 class StandardBUARPNHead(nn.Module):
     """
@@ -128,7 +130,8 @@ class BUARPN(nn.Module):
         del gt_instances
         features = [features[f] for f in self.in_features]
         pred_objectness_logits, pred_anchor_deltas = self.rpn_head(features)
-        anchors = self.anchor_generator(features)
+        anchors_in_image = self.anchor_generator(features)
+        anchors = [copy.deepcopy(anchors_in_image) for _ in range(len(features[0]))]
         # TODO: The anchors only depend on the feature map shape; there's probably
         # an opportunity for some optimizations (e.g., caching anchors).
         outputs = BUARPNOutputs(

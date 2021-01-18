@@ -72,7 +72,13 @@ def annotations_to_instances(annos, image_size, mask_format="polygon"):
     classes = torch.tensor(classes, dtype=torch.int64)
     target.gt_classes = classes
 
-    attributes = [obj["attributes"] for obj in annos]
+    # attributes = [obj["attributes"] for obj in annos]
+    attributes = []
+    for obj in annos:
+        if "attributes" in obj.keys():
+            attributes.append(obj["attributes"])
+        else:
+            attributes.append([-1]*16)
     attributes = torch.tensor(attributes, dtype=torch.int64)
     target.gt_attributes = attributes
 
