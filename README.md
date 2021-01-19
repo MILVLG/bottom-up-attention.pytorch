@@ -177,9 +177,9 @@ We provided pre-trained models as follows, including the models converted from t
 
 Model | Mode |  Backbone  | Objects mAP@0.5 |Objects weighted mAP@0.5|Download
 :-:|:-:|:-:|:-:|:-:|:-:
-[Faster R-CNN-k36](./configs/bua-caffe/extract-bua-caffe-r101-fix36.yaml)|Caffe|ResNet-101|9.3%|14.0%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?e=kNB9pS)
-[Faster R-CNN-k10-100](./configs/bua-caffe/extract-bua-caffe-r101.yaml)|Caffe|ResNet-101|10.2%|15.1%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?e=SFMoeu)
-[Faster R-CNN](./configs/bua-caffe/extract-bua-caffe-r152.yaml)|Caffe|ResNet-152|11.1%|15.7%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?e=rpM1a3)
+[Faster R-CNN-k36](./configs/bua-caffe/extract-bua-caffe-r101-fix36.yaml)|Caffe|ResNet-101|9.3%|14.0%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?download=1)
+[Faster R-CNN-k10-100](./configs/bua-caffe/extract-bua-caffe-r101.yaml)|Caffe|ResNet-101|10.2%|15.1%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?download=1)
+[Faster R-CNN](./configs/bua-caffe/extract-bua-caffe-r152.yaml)|Caffe|ResNet-152|11.1%|15.7%|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?download=1)
 
 
 ## License
@@ -201,3 +201,5 @@ If this repository is helpful for your research or you want to refer the provide
   howpublished = {\url{https://github.com/MILVLG/bottom-up-attention.pytorch}},
   year = {2020}
 }
+
+```
