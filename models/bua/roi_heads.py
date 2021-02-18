@@ -68,6 +68,10 @@ class BUACaffeRes5ROIHeads(ROIHeads):
         self.num_attr_classes = cfg.MODEL.BUA.ATTRIBUTE.NUM_CLASSES
         self.extractor_mode   = cfg.MODEL.BUA.EXTRACTOR.MODE
 
+        self.test_score_thresh        = cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST
+        self.test_nms_thresh          = cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST
+        self.test_detections_per_img  = cfg.TEST.DETECTIONS_PER_IMAGE
+
         self.pooler = ROIPooler(
             output_size=pooler_resolution,
             scales=pooler_scales,
@@ -208,6 +212,10 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
         self.extract_on       = cfg.MODEL.BUA.EXTRACT_FEATS
         self.num_attr_classes = cfg.MODEL.BUA.ATTRIBUTE.NUM_CLASSES
         self.extractor_mode   = cfg.MODEL.BUA.EXTRACTOR.MODE
+
+        self.test_score_thresh        = cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST
+        self.test_nms_thresh          = cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST
+        self.test_detections_per_img  = cfg.TEST.DETECTIONS_PER_IMAGE
 
         self.pooler = ROIPooler(
             output_size=pooler_resolution,
@@ -398,7 +406,7 @@ class BUADetectron2Res5ROIHeads(ROIHeads):
         """
         See :class:`ROIHeads.forward`.
         """
-        image_scales = images.image_scales
+        # image_scales = images.image_scales
         del images
 
         if self.training:
