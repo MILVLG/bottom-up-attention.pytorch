@@ -90,7 +90,7 @@ The following script will train a bottom-up-attention model on the `train` split
 
 ```bash
 $ python3 train_net.py --mode detectron2 \
-         --config-file configs/d2/train-d2-r101.yaml \ 
+         --config-file configs/d2/train-d2-r101.yaml \
          --resume
 ```
 
@@ -106,7 +106,7 @@ Given the trained model, the following script will test the performance on the `
 
 ```bash
 $ python3 train_net.py --mode caffe \
-         --config-file configs/caffe/caffe-r101.yaml \ 
+         --config-file configs/caffe/caffe-r101.yaml \
          --eval-only
 ```
 
@@ -125,7 +125,7 @@ $ python3 extract_features.py --mode caffe \
          --num-cpus 32 --gpus '0,1,2,3' \
          --extract-mode roi_feats \
          --min-max-boxes '10,100' \
-         --config-file configs/caffe/caffe-r101.yaml \ 
+         --config-file configs/caffe/caffe-r101.yaml \
          --image-dir <image_dir> --bbox-dir <out_dir> --out-dir <out_dir>
          --fastmode
 ```
@@ -159,14 +159,14 @@ Using the same pre-trained model, we also provide an alternative *two-stage* str
 $ python3 extract_features.py --mode caffe \
          --num-cpus 32 --gpu '0,1,2,3' \
          --extract-mode bboxes \
-         --config-file configs/caffe/caffe-r101.yaml \ 
+         --config-file configs/caffe/caffe-r101.yaml \
          --image-dir <image_dir> --out-dir <out_dir>  --resume 
 
 # extract visual features with the pre-extracted bboxes:
 $ python3 extract_features.py --mode caffe \
          --num-cpus 32 --gpu '0,1,2,3' \
          --extract-mode bbox_feats \
-         --config-file configs/caffe/caffe-r101.yaml \ 
+         --config-file configs/caffe/caffe-r101.yaml \
          --image-dir <image_dir> --bbox-dir <bbox_dir> --out-dir <out_dir>  --resume 
 
 ```
