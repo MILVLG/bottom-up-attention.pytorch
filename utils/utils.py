@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from detectron2.structures import Instances
-from models.bua.layers.nms import nms
+from bua.caffe.modeling.layers.nms import nms
 
 def save_features(output_file, features, boxes=None):
     if boxes is None:

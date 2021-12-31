@@ -25,11 +25,13 @@ from detectron2.structures import Instances
 from utils.utils import mkdir, save_features
 from utils.extract_utils import get_image_blob, save_bbox, save_roi_features_by_bbox, save_roi_features
 from utils.progress_bar import ProgressBar
-from models import add_config
-from models.bua.box_regression import BUABoxes
-
-import ray
-from ray.actor import ActorHandle
+from bua import add_config
+from bua.caffe.modeling.box_regression import BUABoxes
+from torch.nn import functional as F
+from detectron2.modeling import postprocessing
+from extract_features_singlegpu import extract_feat_singlegpu_start
+from extract_features_multigpu import extract_feat_multigpu_start
+from extract_features_faster import extract_feat_faster_start
 
 def switch_extract_mode(mode):
     if mode == 'roi_feats':
@@ -64,95 +66,12 @@ def setup(args):
     add_config(args, cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
+    cfg.merge_from_list(['MODEL.BUA.EXTRACT_FEATS',True])
     cfg.merge_from_list(switch_extract_mode(args.extract_mode))
     cfg.merge_from_list(set_min_max_boxes(args.min_max_boxes))
     cfg.freeze()
     default_setup(cfg, args)
     return cfg
-
-def generate_npz(extract_mode, *args):
-    if extract_mode == 1:
-        save_roi_features(*args)
-    elif extract_mode == 2:
-        save_bbox(*args)
-    elif extract_mode == 3:
-        save_roi_features_by_bbox(*args)
-    else:
-        print('Invalid Extract Mode! ')
-
-@ray.remote(num_gpus=1)
-def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
-    num_images = len(img_list)
-    print('Number of images on split{}: {}.'.format(split_idx, num_images))
-
-    model = DefaultTrainer.build_model(cfg)
-    DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
-        cfg.MODEL.WEIGHTS, resume=args.resume
-    )
-    model.eval()
-
-    for im_file in (img_list):
-        if os.path.exists(os.path.join(args.output_dir, im_file.split('.')[0]+'.npz')):
-            actor.update.remote(1)
-            continue
-        im = cv2.imread(os.path.join(args.image_dir, im_file))
-        if im is None:
-            print(os.path.join(args.image_dir, im_file), "is illegal!")
-            actor.update.remote(1)
-            continue
-        dataset_dict = get_image_blob(im, cfg.MODEL.PIXEL_MEAN)
-        # extract roi features
-        if cfg.MODEL.BUA.EXTRACTOR.MODE == 1:
-            attr_scores = None
-            with torch.set_grad_enabled(False):
-                if cfg.MODEL.BUA.ATTRIBUTE_ON:
-                    boxes, scores, features_pooled, attr_scores = model([dataset_dict])
-                else:
-                    boxes, scores, features_pooled = model([dataset_dict])
-            boxes = [box.tensor.cpu() for box in boxes]
-            scores = [score.cpu() for score in scores]
-            features_pooled = [feat.cpu() for feat in features_pooled]
-            if not attr_scores is None:
-                attr_scores = [attr_score.cpu() for attr_score in attr_scores]
-            generate_npz(1, 
-                args, cfg, im_file, im, dataset_dict, 
-                boxes, scores, features_pooled, attr_scores)
-        # extract bbox only
-        elif cfg.MODEL.BUA.EXTRACTOR.MODE == 2:
-            with torch.set_grad_enabled(False):
-                boxes, scores = model([dataset_dict])
-            boxes = [box.cpu() for box in boxes]
-            scores = [score.cpu() for score in scores]
-            generate_npz(2,
-                args, cfg, im_file, im, dataset_dict, 
-                boxes, scores)
-        # extract roi features by bbox
-        elif cfg.MODEL.BUA.EXTRACTOR.MODE == 3:
-            if not os.path.exists(os.path.join(args.bbox_dir, im_file.split('.')[0]+'.npz')):
-                actor.update.remote(1)
-                continue
-            bbox = torch.from_numpy(np.load(os.path.join(args.bbox_dir, im_file.split('.')[0]+'.npz'))['bbox']) * dataset_dict['im_scale']
-            proposals = Instances(dataset_dict['image'].shape[-2:])
-            proposals.proposal_boxes = BUABoxes(bbox)
-            dataset_dict['proposals'] = proposals
-
-            attr_scores = None
-            with torch.set_grad_enabled(False):
-                if cfg.MODEL.BUA.ATTRIBUTE_ON:
-                    boxes, scores, features_pooled, attr_scores = model([dataset_dict])
-                else:
-                    boxes, scores, features_pooled = model([dataset_dict])
-            boxes = [box.tensor.cpu() for box in boxes]
-            scores = [score.cpu() for score in scores]
-            features_pooled = [feat.cpu() for feat in features_pooled]
-            if not attr_scores is None:
-                attr_scores = [attr_score.data.cpu() for attr_score in attr_scores]
-            generate_npz(3, 
-                args, cfg, im_file, im, dataset_dict, 
-                boxes, scores, features_pooled, attr_scores)
-
-        actor.update.remote(1)
-
 
 def main():
     parser = argparse.ArgumentParser(description="PyTorch Object Detection2 Inference")
@@ -169,7 +88,8 @@ def main():
     parser.add_argument('--gpus', dest='gpu_id', help='GPU id(s) to use',
                         default='0', type=str)
 
-    parser.add_argument("--mode", default="caffe", type=str, help="bua_caffe, ...")
+    parser.add_argument("--mode", default="caffe", type=str, help="'caffe' and 'detectron2' indicates \
+                        'use caffe model' and 'use detectron2 model'respectively")
 
     parser.add_argument('--extract-mode', default='roi_feats', type=str,
                         help="'roi_feats', 'bboxes' and 'bbox_feats' indicates \
@@ -188,6 +108,8 @@ def main():
     parser.add_argument('--bbox-dir', dest='bbox_dir',
                         help='directory with bbox',
                         default="bbox")
+    parser.add_argument("--fastmode", action="store_true", help="whether to use multi cpus to extract faster.",)
+
     parser.add_argument(
         "--resume",
         action="store_true",
@@ -203,36 +125,18 @@ def main():
     args = parser.parse_args()
 
     cfg = setup(args)
-
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
     num_gpus = len(args.gpu_id.split(','))
 
-    MIN_BOXES = cfg.MODEL.BUA.EXTRACTOR.MIN_BOXES
-    MAX_BOXES = cfg.MODEL.BUA.EXTRACTOR.MAX_BOXES
-    CONF_THRESH = cfg.MODEL.BUA.EXTRACTOR.CONF_THRESH
-
-    # Extract features.
-    imglist = os.listdir(args.image_dir)
-    num_images = len(imglist)
-    print('Number of images: {}.'.format(num_images))
-
-    if args.num_cpus != 0:
-        ray.init(num_cpus=args.num_cpus)
-    else:
-        ray.init()
-    img_lists = [imglist[i::num_gpus] for i in range(num_gpus)]
-
-    pb = ProgressBar(len(imglist))
-    actor = pb.actor
-
-    print('Number of GPUs: {}.'.format(num_gpus))
-    extract_feat_list = []
-    for i in range(num_gpus):
-        extract_feat_list.append(extract_feat.remote(i, img_lists[i], cfg, args, actor))
-    
-    pb.print_until_done()
-    ray.get(extract_feat_list)
-    ray.get(actor.get_counter.remote())
+    if args.fastmode: # faster.py
+        print("faster")
+        extract_feat_faster_start(args,cfg)
+    else:  # multi or single
+        if num_gpus == 1: # without ray
+            print("single")
+            extract_feat_singlegpu_start(args,cfg)
+        else: # use ray to accelerate
+            print("multi")
+            extract_feat_multigpu_start(args,cfg)
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,10 @@
+/bottom_up_attention.pytorch.egg-info/
+__pycache__/
+.ipynb_checkpoints/
+/build/
+/datasets/visual_genome/
+/extract/
+/output/
+/output_caffe152/
+*.pth
+*.pkl

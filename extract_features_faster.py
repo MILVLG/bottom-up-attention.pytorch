@@ -25,12 +25,15 @@ from detectron2.structures import Instances
 from utils.utils import mkdir, save_features
 from utils.extract_utils import get_image_blob, save_bbox, save_roi_features_by_bbox, save_roi_features
 from utils.progress_bar import ProgressBar
-from models import add_config
-from models.bua.box_regression import BUABoxes
+from bua import add_config
+from bua.caffe.modeling.box_regression import BUABoxes
 
 import ray
 from ray.actor import ActorHandle
 
+"""
+add ray to generate_npz
+"""
 def switch_extract_mode(mode):
     if mode == 'roi_feats':
         switch_cmd = ['MODEL.BUA.EXTRACTOR.MODE', 1]
@@ -64,6 +67,7 @@ def setup(args):
     add_config(args, cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
+    cfg.merge_from_list(['MODEL.BUA.EXTRACT_FEATS',True])
     cfg.merge_from_list(switch_extract_mode(args.extract_mode))
     cfg.merge_from_list(set_min_max_boxes(args.min_max_boxes))
     cfg.freeze()
@@ -82,8 +86,25 @@ def generate_npz(extract_mode, pba: ActorHandle, *args):
         print('Invalid Extract Mode! ')
     pba.update.remote(1)
 
+def model_inference(model, batched_inputs, args, attribute_on=False):
+    if args.mode == "caffe":
+        return model(batched_inputs)
+    elif args.mode == "detectron2":
+        images = model.preprocess_image(batched_inputs)
+        features = model.backbone(images.tensor)
+
+        if model.proposal_generator:
+            proposals, _ = model.proposal_generator(images, features, None)
+        else:
+            assert "proposals" in batched_inputs[0]
+            proposals = [x["proposals"].to(model.device) for x in batched_inputs]
+        
+        return model.roi_heads(images, features, proposals, None)
+    else:
+        raise Exception("detection model not supported: {}".format(args.model))
+
 @ray.remote(num_gpus=1)
-def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
+def extract_feat_faster(split_idx, img_list, cfg, args, actor: ActorHandle):
     num_images = len(img_list)
     print('Number of images on split{}: {}.'.format(split_idx, num_images))
 
@@ -109,9 +130,9 @@ def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
             attr_scores = None
             with torch.set_grad_enabled(False):
                 if cfg.MODEL.BUA.ATTRIBUTE_ON:
-                    boxes, scores, features_pooled, attr_scores = model([dataset_dict])
+                    boxes, scores, features_pooled, attr_scores = model_inference(model, [dataset_dict],args,True)
                 else:
-                    boxes, scores, features_pooled = model([dataset_dict])
+                    boxes, scores, features_pooled = model_inference(model, [dataset_dict],args,False)
             boxes = [box.tensor.cpu() for box in boxes]
             scores = [score.cpu() for score in scores]
             features_pooled = [feat.cpu() for feat in features_pooled]
@@ -123,7 +144,7 @@ def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
         # extract bbox only
         elif cfg.MODEL.BUA.EXTRACTOR.MODE == 2:
             with torch.set_grad_enabled(False):
-                boxes, scores = model([dataset_dict])
+                boxes, scores = model_inference(model, [dataset_dict],args,False)
             boxes = [box.cpu() for box in boxes]
             scores = [score.cpu() for score in scores]
             generate_npz_list.append(generate_npz.remote(2, actor, 
@@ -142,9 +163,9 @@ def extract_feat(split_idx, img_list, cfg, args, actor: ActorHandle):
             attr_scores = None
             with torch.set_grad_enabled(False):
                 if cfg.MODEL.BUA.ATTRIBUTE_ON:
-                    boxes, scores, features_pooled, attr_scores = model([dataset_dict])
+                    boxes, scores, features_pooled, attr_scores = model_inference(model, [dataset_dict],args,True)
                 else:
-                    boxes, scores, features_pooled = model([dataset_dict])
+                    boxes, scores, features_pooled = model_inference(model, [dataset_dict],args,False)
             boxes = [box.tensor.cpu() for box in boxes]
             scores = [score.cpu() for score in scores]
             features_pooled = [feat.cpu() for feat in features_pooled]
@@ -206,7 +227,9 @@ def main():
     args = parser.parse_args()
 
     cfg = setup(args)
+    extract_feat_faster_start(args,cfg)
 
+def extract_feat_faster_start(args,cfg):
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
     num_gpus = len(args.gpu_id.split(','))
 
@@ -231,7 +254,7 @@ def main():
     print('Number of GPUs: {}.'.format(num_gpus))
     extract_feat_list = []
     for i in range(num_gpus):
-        extract_feat_list.append(extract_feat.remote(i, img_lists[i], cfg, args, actor))
+        extract_feat_list.append(extract_feat_faster.remote(i, img_lists[i], cfg, args, actor))
     
     pb.print_until_done()
     ray.get(extract_feat_list)
