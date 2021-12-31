@@ -1,4 +1,3 @@
-OUTPUT_DIR: "/data/wangt/output/bua/r50"
 _BASE_: "base-d2.yaml"
 MODEL:
   WEIGHTS: "R-50.pkl"

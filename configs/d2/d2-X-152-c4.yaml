@@ -1,5 +1,5 @@
 MODEL:
-  WEIGHTS: "region-c4-X-152.pth"
+  WEIGHTS: "bua-d2-frcn-x152.pth"
   META_ARCHITECTURE: "GeneralizedRCNN"
   ATTRIBUTE_ON: True
   BUA:

@@ -1,7 +1,6 @@
-OUTPUT_DIR: "/data/wangt/output/bua/r50"
 _BASE_: "base-d2.yaml"
 MODEL:
-  WEIGHTS: "d2-r50.pth"
+  WEIGHTS: "bua-d2-frcn-r50.pth"
   BUA:
     ATTRIBUTE_ON: True
     EXTRACTOR:

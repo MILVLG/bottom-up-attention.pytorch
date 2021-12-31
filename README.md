@@ -66,7 +66,7 @@ If you want to train or test the model, you need to download the images and anno
 
 The original VG images ([part1](https://cs.stanford.edu/people/rak248/VG_100K_2/images.zip) and [part2](https://cs.stanford.edu/people/rak248/VG_100K_2/images2.zip)) are to be downloaded and unzipped to one folder and put it into the `datasets` folder.
 
-The generated annotation files in the original repository are needed to be transformed to a COCO data format required by Detectron2. The preprocessed annotation files can be downloaded [here](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EWpiE_5PvBdKiKfCi0pBx_EB5ONo8D8XABUz7tWcnltCrw?e=xIeW23) and unzipped to the `dataset` folder.
+The generated annotation files in the original repository are needed to be transformed to a COCO data format required by Detectron2. The preprocessed annotation files can be downloaded [here](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EWpiE_5PvBdKiKfCi0pBx_EB5ONo8D8XABUz7tWcnltCrw?download=1) and unzipped to the `dataset` folder.
 
 Finally, the `datasets` folders will have the following structure:
 
@@ -79,9 +79,9 @@ Finally, the `datasets` folders will have the following structure:
    |  |  |  |-- ...
    |  |  |  |-- ...
    |  |-- annotations
-   |  |  |-- train.json
-   |  |  |-- test.json
-   |  |  |-- val.json
+   |  |  |-- visual_genome_train.json
+   |  |  |-- visual_genome_test.json
+   |  |  |-- visual_genome_val.json
 ```
 
 ## Training
@@ -181,12 +181,12 @@ For the models of the `d2` mode, we follow the configurations and implementation
 
 name | mode | objects mAP@0.5 |weighted objects mAP@0.5|download
 :-:|:-:|:-:|:-:|:-:
-[R101-k36](./configs/bua-caffe/extract-bua-caffe-r101-fix36.yaml)|caffe|9.3|14.0|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?download=1)
-[R101-k10-100](./configs/bua-caffe/extract-bua-caffe-r101.yaml)|caffe|10.2|15.1|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?download=1)
-[R-152](./configs/bua-caffe/extract-bua-caffe-r152.yaml)|caffe|**11.1**|15.7|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?download=1)
-[R50-C4](./configs/d2/d2-r50.yaml)|d2|8.2|14.9|[model]()
-[R101-C4](./configs/d2/d2-r101.yaml)|d2|9.2|15.9|[model]()
-[X152-C4](./configs/d2/d2-X-152-c4.yaml)|d2|10.7|**17.7**|[model]()
+[R101-k36](./configs/caffe/caffe-r101-fix36.yaml)|caffe|9.3|14.0|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?download=1)
+[R101-k10-100](./configs/caffe/caffe-r101.yaml)|caffe|10.2|15.1|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?download=1)
+[R-152](./configs/caffe/caffe-r152.yaml)|caffe|**11.1**|15.7|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?download=1)
+[R50-C4](./configs/d2/d2-r50.yaml)|d2|8.2|14.9|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EfYoinBHrFlKmKonocse8yEBXN-hyCHNygYqjxGpIBsPvQ?download=1)
+[R101-C4](./configs/d2/d2-r101.yaml)|d2|9.2|15.9|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EXXItFlOpHlNq81O1H_cPyoBXUPyXoHmIwPEudnTWKX4rQ?download=1)
+[X152-C4](./configs/d2/d2-X-152-c4.yaml)|d2|10.7|**17.7**|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EdLhYc39P8tBkEDVCDOrNV4BgPhz9M4iBq8oPw1iyVSlmg?download=1)
 
 
 ## License

@@ -1,6 +1,6 @@
 OUTPUT_DIR: "./output_caffe152"
 MODEL:
-  WEIGHTS: "bua-caffe-frcn-r152_with_attributes.pth"
+  WEIGHTS: "bua-caffe-frcn-r152.pth"
   META_ARCHITECTURE: "GeneralizedBUARCNN"
   PIXEL_MEAN: [0, 0, 0]
   ANCHOR_GENERATOR:
