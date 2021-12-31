@@ -186,7 +186,7 @@ name | mode | objects mAP@0.5 |weighted objects mAP@0.5|download
 [R-152](./configs/bua-caffe/extract-bua-caffe-r152.yaml)|caffe|**11.1**|15.7|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?download=1)
 [R50-C4](./configs/d2/d2-r50.yaml)|d2|8.2|14.9|[model]()
 [R101-C4](./configs/d2/d2-r101.yaml)|d2|9.2|15.9|[model]()
-[X152-C4](./configs/d2/.yaml)|d2|10.7|**17.7**|[model]()
+[X152-C4](./configs/d2/d2-X-152-c4.yaml)|d2|10.7|**17.7**|[model]()
 
 
 ## License
