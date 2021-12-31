@@ -13,7 +13,7 @@ assert torch_ver >= [1, 3], "Requires PyTorch >= 1.3"
 
 def get_extensions():
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    extensions_dir = os.path.join(this_dir, "models", "bua", "layers", "csrc")
+    extensions_dir = os.path.join(this_dir, "bua","caffe", "modeling","layers", "csrc")
 
     main_source = os.path.join(extensions_dir, "vision.cpp")
     sources = glob.glob(os.path.join(extensions_dir, "**", "*.cpp"))
@@ -50,7 +50,7 @@ def get_extensions():
 
     ext_modules = [
         extension(
-            "models.bua._C",
+            "bua.caffe.modeling._C",
             sources,
             include_dirs=include_dirs,
             define_macros=define_macros,
