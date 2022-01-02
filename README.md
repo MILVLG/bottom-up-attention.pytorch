@@ -186,7 +186,7 @@ name | mode | objects mAP@0.5 |weighted objects mAP@0.5|download
 [R152](./configs/caffe/test-caffe-r152.yaml)|caffe|**11.1**|15.7|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?download=1)
 [R50](./configs/d2/test-d2-r50.yaml)|d2|8.2|14.9|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EfYoinBHrFlKmKonocse8yEBXN-hyCHNygYqjxGpIBsPvQ?download=1)
 [R101](./configs/d2/test-d2-r101.yaml)|d2|9.2|15.9|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EXXItFlOpHlNq81O1H_cPyoBXUPyXoHmIwPEudnTWKX4rQ?download=1)
-[X152](./configs/d2/d2-X152.yaml)|d2|10.7|**17.7**|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EdLhYc39P8tBkEDVCDOrNV4BgPhz9M4iBq8oPw1iyVSlmg?download=1)
+[X152](./configs/d2/test-d2-X152.yaml)|d2|10.7|**17.7**|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EdLhYc39P8tBkEDVCDOrNV4BgPhz9M4iBq8oPw1iyVSlmg?download=1)
 
 
 ## License
