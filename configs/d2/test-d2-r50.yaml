@@ -1,0 +1,12 @@
+_BASE_: "base-d2.yaml"
+MODEL:
+  WEIGHTS: "bua-d2-frcn-r50.pth"
+  BUA:
+    ATTRIBUTE_ON: True
+    EXTRACTOR:
+      MODE: 1
+      MIN_BOXES: 10
+      MAX_BOXES: 20
+      CONF_THRESH: 0.4
+  RESNETS:
+    DEPTH: 50

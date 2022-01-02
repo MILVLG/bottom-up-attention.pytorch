@@ -1,24 +1,10 @@
-import os
-import errno
+# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+
 import numpy as np
 import torch
 
 from detectron2.structures import Instances
-from bua.caffe.modeling.layers.nms import nms
-
-def save_features(output_file, features, boxes=None):
-    if boxes is None:
-        res = features
-        np.save(output_file, res)
-    else:
-        np.savez(output_file, x=features, bbox=boxes)
-
-def mkdir(path):
-    try:
-        os.makedirs(path)
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
+from modeling.layers.nms import nms  # BC-compat
 
 def extractor_postprocess(boxes, scores, features_pooled, input_per_image, extractor):
     """
@@ -61,6 +47,8 @@ def extractor_postprocess(boxes, scores, features_pooled, input_per_image, extra
         keep_boxes = torch.argsort(max_conf, descending=True)[:MIN_BOXES]
     elif len(keep_boxes) > MAX_BOXES:
         keep_boxes = torch.argsort(max_conf, descending=True)[:MAX_BOXES]
+        # keep_boxes = torch.argsort(max_conf, descending=True)[:100]
+        # feat_list.append(feats[i][keep_boxes])
     image_feat = features_pooled[keep_boxes]
     image_bboxes = dets[keep_boxes]
 

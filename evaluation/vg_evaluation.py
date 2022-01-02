@@ -113,8 +113,8 @@ class VGEvaluator(DatasetEvaluator):
             gt_classes = np.zeros((num_objs), dtype=np.int32)
             for ind, item in enumerate(dataset.imgToAnns[img_index]):
                 bboxes[ind, :] = item['bbox']
-                gt_classes[ind] = item['category_id']
-                for j, attr in enumerate(item['attribute']):
+                gt_classes[ind] = item['category_id'] + 1 # NOTE
+                for j, attr in enumerate(item['attribute_ids']):
                     gt_attributes[ind, j] = attr
             bboxes[:, 2] = bboxes[:, 2] + bboxes[:, 0]
             bboxes[:, 3] = bboxes[:, 3] + bboxes[:, 1]
@@ -275,13 +275,13 @@ class VGEvaluator(DatasetEvaluator):
         print('Mean AP = {:.4f}'.format(np.mean(aps)))
         print('Weighted Mean AP = {:.4f}'.format(np.average(aps, weights=weights)))
         print('Mean Detection Threshold = {:.3f}'.format(avg_thresh))
-        print('~~~~~~~~')
-        print('Results:')
-        for ap, npos in zip(aps, nposs):
-            print('{:.3f}\t{:.3f}'.format(ap, npos))
-        print('{:.3f}'.format(np.mean(aps)))
-        print('~~~~~~~~')
-        print('')
-        print('--------------------------------------------------------------')
+        # print('~~~~~~~~')
+        # print('Results:')
+        # for ap, npos in zip(aps, nposs):
+        #     print('{:.3f}\t{:.3f}'.format(ap, npos))
+        # print('{:.3f}'.format(np.mean(aps)))
+        # print('~~~~~~~~')
+        # print('')
+        # print('--------------------------------------------------------------')
         print('Results computed with the **unofficial** PASCAL VOC Python eval code.')
         print('--------------------------------------------------------------')
