@@ -40,7 +40,7 @@ class Trainer(DefaultTrainer):
     def build_test_loader(cls, cfg, dataset_name):
         if cfg.MODE == "caffe":
             return build_detection_test_loader(cfg, dataset_name, mapper=DatasetMapper(cfg, False))
-        elif cfg.MODE == "detectron2":
+        elif cfg.MODE == "d2":
             return build_detection_test_loader_with_attributes(cfg, dataset_name)
         else:
             raise Exception("detectron mode note supported: {}".format(args.model))
@@ -51,7 +51,7 @@ class Trainer(DefaultTrainer):
     def build_train_loader(cls, cfg):
         if cfg.MODE == "caffe":
             return build_detection_train_loader(cfg, mapper=DatasetMapper(cfg, True))
-        elif cfg.MODE == "detectron2":
+        elif cfg.MODE == "d2":
             return build_detection_train_loader_with_attributes(cfg)
         else:
             raise Exception("detectron mode note supported: {}".format(args.model))

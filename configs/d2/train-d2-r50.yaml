@@ -1,6 +1,6 @@
 _BASE_: "base-d2.yaml"
 MODEL:
-  WEIGHTS: "R-50.pkl"
+  WEIGHTS: "R-50.pkl" # the backbone weight is download from d2 at https://dl.fbaipublicfiles.com/detectron2/ImageNetPretrained/MSRA/R-50.pkl
   BUA:
     ATTRIBUTE_ON: True
     EXTRACTOR:

@@ -89,12 +89,12 @@ Finally, the `datasets` folders will have the following structure:
 The following script will train a bottom-up-attention model on the `train` split of VG. 
 
 ```bash
-$ python3 train_net.py --mode detectron2 \
+$ python3 train_net.py --mode d2 \
          --config-file configs/d2/train-d2-r101.yaml \
          --resume
 ```
 
-1. `mode = 'd2'` refers to training a model with the Detectron2 backend. We think it is unnecessary to train a new model using the `caffe` mode. The pre-trained Caffe models are provided for testing and feature extraction. 
+1. `mode = 'd2'` refers to training a model with the Detectron2 backend, which is inspired by the [grid-feats-vqa](https://github.com/facebookresearch/grid-feats-vqa/). We think it is unnecessary to train a new model using the `caffe` mode. The pre-trained Caffe models are provided for testing and feature extraction. 
 
 2. `config-file` refers to all the configurations of the model.
 
@@ -106,7 +106,7 @@ Given the trained model, the following script will test the performance on the `
 
 ```bash
 $ python3 train_net.py --mode caffe \
-         --config-file configs/caffe/caffe-r101.yaml \
+         --config-file configs/caffe/test-caffe-r101.yaml \
          --eval-only
 ```
 
@@ -125,7 +125,7 @@ $ python3 extract_features.py --mode caffe \
          --num-cpus 32 --gpus '0,1,2,3' \
          --extract-mode roi_feats \
          --min-max-boxes '10,100' \
-         --config-file configs/caffe/caffe-r101.yaml \
+         --config-file configs/caffe/test-caffe-r101.yaml \
          --image-dir <image_dir> --bbox-dir <out_dir> --out-dir <out_dir>
          --fastmode
 ```
@@ -159,14 +159,14 @@ Using the same pre-trained model, we also provide an alternative *two-stage* str
 $ python3 extract_features.py --mode caffe \
          --num-cpus 32 --gpu '0,1,2,3' \
          --extract-mode bboxes \
-         --config-file configs/caffe/caffe-r101.yaml \
+         --config-file configs/caffe/test-caffe-r101.yaml \
          --image-dir <image_dir> --out-dir <out_dir>  --resume 
 
 # extract visual features with the pre-extracted bboxes:
 $ python3 extract_features.py --mode caffe \
          --num-cpus 32 --gpu '0,1,2,3' \
          --extract-mode bbox_feats \
-         --config-file configs/caffe/caffe-r101.yaml \
+         --config-file configs/caffe/test-caffe-r101.yaml \
          --image-dir <image_dir> --bbox-dir <bbox_dir> --out-dir <out_dir>  --resume 
 
 ```
@@ -181,12 +181,12 @@ For the models of the `d2` mode, we follow the configurations and implementation
 
 name | mode | objects mAP@0.5 |weighted objects mAP@0.5|download
 :-:|:-:|:-:|:-:|:-:
-[R101-k36](./configs/caffe/caffe-r101-fix36.yaml)|caffe|9.3|14.0|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?download=1)
-[R101-k10-100](./configs/caffe/caffe-r101.yaml)|caffe|10.2|15.1|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?download=1)
-[R-152](./configs/caffe/caffe-r152.yaml)|caffe|**11.1**|15.7|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?download=1)
-[R50-C4](./configs/d2/d2-r50.yaml)|d2|8.2|14.9|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EfYoinBHrFlKmKonocse8yEBXN-hyCHNygYqjxGpIBsPvQ?download=1)
-[R101-C4](./configs/d2/d2-r101.yaml)|d2|9.2|15.9|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EXXItFlOpHlNq81O1H_cPyoBXUPyXoHmIwPEudnTWKX4rQ?download=1)
-[X152-C4](./configs/d2/d2-X-152-c4.yaml)|d2|10.7|**17.7**|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EdLhYc39P8tBkEDVCDOrNV4BgPhz9M4iBq8oPw1iyVSlmg?download=1)
+[R101-k36](./configs/caffe/test-caffe-r101-fix36.yaml)|caffe|9.3|14.0|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EUKhQ3hSRv9JrrW64qpNLSIBGoOjEGCkF8zvgBP9gKax-w?download=1)
+[R101-k10-100](./configs/caffe/test-caffe-r101.yaml)|caffe|10.2|15.1|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaXvCC3WjtlLvvEfLr3oa8UBLA21tcLh4L8YLbYXl6jgjg?download=1)
+[R152](./configs/caffe/test-caffe-r152.yaml)|caffe|**11.1**|15.7|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETDgy4bY0xpGgsu5tEMzgLcBQjAwpnkKkltNTtPVuMj4GQ?download=1)
+[R50](./configs/d2/test-d2-r50.yaml)|d2|8.2|14.9|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EfYoinBHrFlKmKonocse8yEBXN-hyCHNygYqjxGpIBsPvQ?download=1)
+[R101](./configs/d2/test-d2-r101.yaml)|d2|9.2|15.9|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EXXItFlOpHlNq81O1H_cPyoBXUPyXoHmIwPEudnTWKX4rQ?download=1)
+[X152](./configs/d2/d2-X152.yaml)|d2|10.7|**17.7**|[model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EdLhYc39P8tBkEDVCDOrNV4BgPhz9M4iBq8oPw1iyVSlmg?download=1)
 
 
 ## License

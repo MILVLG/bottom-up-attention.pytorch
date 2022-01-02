@@ -29,9 +29,9 @@ from bua import add_config
 from bua.caffe.modeling.box_regression import BUABoxes
 from torch.nn import functional as F
 from detectron2.modeling import postprocessing
-from extract_features_singlegpu import extract_feat_singlegpu_start
-from extract_features_multigpu import extract_feat_multigpu_start
-from extract_features_faster import extract_feat_faster_start
+from utils.extract_features_singlegpu import extract_feat_singlegpu_start
+from utils.extract_features_multigpu import extract_feat_multigpu_start
+from utils.extract_features_faster import extract_feat_faster_start
 
 def switch_extract_mode(mode):
     if mode == 'roi_feats':
@@ -77,7 +77,7 @@ def main():
     parser = argparse.ArgumentParser(description="PyTorch Object Detection2 Inference")
     parser.add_argument(
         "--config-file",
-        default="configs/bua-caffe/extract-bua-caffe-r101.yaml",
+        default="configs/caffe/test-caffe-r101.yaml",
         metavar="FILE",
         help="path to config file",
     )
@@ -88,7 +88,7 @@ def main():
     parser.add_argument('--gpus', dest='gpu_id', help='GPU id(s) to use',
                         default='0', type=str)
 
-    parser.add_argument("--mode", default="caffe", type=str, help="'caffe' and 'detectron2' indicates \
+    parser.add_argument("--mode", default="caffe", type=str, help="'caffe' and 'd2' indicates \
                         'use caffe model' and 'use detectron2 model'respectively")
 
     parser.add_argument('--extract-mode', default='roi_feats', type=str,
@@ -126,7 +126,7 @@ def main():
 
     cfg = setup(args)
     num_gpus = len(args.gpu_id.split(','))
-
+    print(args.mode)
     if args.fastmode: # faster.py
         print("faster")
         extract_feat_faster_start(args,cfg)
