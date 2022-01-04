@@ -177,7 +177,7 @@ We provided pre-trained models as follows, including the models trained in both 
 
 For the models of the `caffe` mode, `R101-k36` and `R101-k10-100` refer to the [fix36 model](https://www.dropbox.com/s/2h4hmgcvpaewizu/resnet101_faster_rcnn_final_iter_320000.caffemodel?dl=1) and [dynamic 10-100 model](https://www.dropbox.com/s/5xethd2nxa8qrnq/resnet101_faster_rcnn_final.caffemodel?dl=1) provided in the original [bottom-up-attention](https://github.com/peteanderson80/bottom-up-attention) repository. We additionally provide a `R-152` model which outperforms the two counterparts above.  
 
-For the models of the `d2` mode, we follow the configurations and implementations in the [grid-feats-vqa](https://github.com/facebookresearch/grid-feats-vqa/) and trained three models using the training script in this repository, namely `R50-C4`, `R101-C4` and `X152-C4`.
+For the models of the `d2` mode, we follow the configurations and implementations in the [grid-feats-vqa](https://github.com/facebookresearch/grid-feats-vqa/) and trained three models using the training script in this repository, namely `R50`, `R101` and `X152`.
 
 name | mode | objects mAP@0.5 |weighted objects mAP@0.5|download
 :-:|:-:|:-:|:-:|:-:
