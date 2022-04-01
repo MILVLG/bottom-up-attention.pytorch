@@ -140,7 +140,7 @@ $ python3 extract_features.py --mode caffe \
 
 5. `extract-mode` refers to the modes for feature extraction, including {`roi_feats`, `bboxes` and `bbox_feats`}. 
 
-6. `min-max-boxes` refers to the min-and-max number of features (boxes) to be extracted. 
+6. `min-max-boxes` refers to the min-and-max number of features (boxes) to be extracted. **Note**  `mode d2` only support to set the min-and-max number as `'100,100'` to get 100 boxes per image or other values to get about 50~60 boxes per image.
 
 7. `image-dir` refers to the input image directory.
 

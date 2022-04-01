@@ -85,23 +85,6 @@ def generate_npz(extract_mode, *args):
     else:
         print('Invalid Extract Mode! ')
 
-def model_inference(model, batched_inputs, args, attribute_on=False):
-    if args.mode == "caffe":
-        return model(batched_inputs)
-    elif args.mode == "d2":
-        images = model.preprocess_image(batched_inputs)
-        features = model.backbone(images.tensor)
-
-        if model.proposal_generator:
-            proposals, _ = model.proposal_generator(images, features, None)
-        else:
-            assert "proposals" in batched_inputs[0]
-            proposals = [x["proposals"].to(model.device) for x in batched_inputs]
-        
-        return model.roi_heads(images, features, proposals, None)
-    else:
-        raise Exception("detection model not supported: {}".format(args.model))
-
 @ray.remote(num_gpus=1)
 def extract_feat_multigpu(split_idx, img_list, cfg, args, actor: ActorHandle): # NOTE ray  
     num_images = len(img_list)
@@ -128,9 +111,9 @@ def extract_feat_multigpu(split_idx, img_list, cfg, args, actor: ActorHandle): #
             attr_scores = None
             with torch.set_grad_enabled(False):
                 if cfg.MODEL.BUA.ATTRIBUTE_ON:
-                    boxes, scores, features_pooled, attr_scores = model_inference(model, [dataset_dict],args,True)
+                    boxes, scores, features_pooled, attr_scores = model([dataset_dict])
                 else:
-                    boxes, scores, features_pooled = model_inference(model, [dataset_dict],args,False)
+                    boxes, scores, features_pooled = model([dataset_dict])
             boxes = [box.tensor.cpu() for box in boxes]
             scores = [score.cpu() for score in scores]
             features_pooled = [feat.cpu() for feat in features_pooled]
@@ -142,7 +125,7 @@ def extract_feat_multigpu(split_idx, img_list, cfg, args, actor: ActorHandle): #
         # extract bbox only
         elif cfg.MODEL.BUA.EXTRACTOR.MODE == 2:
             with torch.set_grad_enabled(False):
-                boxes, scores = model_inference(model, [dataset_dict],args,False)
+                boxes, scores = model([dataset_dict])
             boxes = [box.cpu() for box in boxes]
             scores = [score.cpu() for score in scores]
             generate_npz(2,
@@ -161,9 +144,9 @@ def extract_feat_multigpu(split_idx, img_list, cfg, args, actor: ActorHandle): #
             attr_scores = None
             with torch.set_grad_enabled(False):
                 if cfg.MODEL.BUA.ATTRIBUTE_ON:
-                    boxes, scores, features_pooled, attr_scores = model_inference(model, [dataset_dict],args,True)
+                    boxes, scores, features_pooled, attr_scores = model([dataset_dict])
                 else:
-                    boxes, scores, features_pooled = model_inference(model, [dataset_dict],args,False)
+                    boxes, scores, features_pooled = model([dataset_dict])
             boxes = [box.tensor.cpu() for box in boxes]
             scores = [score.cpu() for score in scores]
             features_pooled = [feat.cpu() for feat in features_pooled]
