@@ -13,7 +13,6 @@ import torch
 import cv2
 import numpy as np
 
-from bua.d2.config import add_swint_config
 sys.path.append('detectron2')
 
 from detectron2.structures import Boxes
@@ -40,25 +39,6 @@ from bua.d2.modeling.roi_heads import AttributeROIHeads, AttributeRes5ROIHeads,r
 import ray
 from ray.actor import ActorHandle
 from glob import glob
-
-"""
-50-60 origin 
-100 open nms
-
-python extract_d2feats_mode3.py --mode d2 \
-         --num-cpus 8 --gpu '1' \
-         --extract-mode roi_feats \
-         --config-file configs/d2/test-d2-r101.yaml \
-         --image-dir /home/wangt/milvlg/bottom-up-attention.pytorch/datasets/demo/ \
-         --out-dir /home/wangt/milvlg/bottom-up-attention.pytorch/datasets/output_mypy/  --resume 
-         
-python extract_d2feats_mode3.py --mode d2 \
-         --num-cpus 32 --gpu '0,1' \
-         --extract-mode roi_feats \
-         --config-file configs/d2/train-d2-convnext-large.yaml \
-         --image-dir /public/home/u41882/milvlg/bottom-up-attention.pytorch/datasets/coco/image2014/train2014/ \
-         --out-dir /public/home/u41882/datasets/features/convnext_large_ori/train2014/
-"""
 
 def switch_extract_mode(mode):
     if mode == 'roi_feats':
@@ -194,7 +174,6 @@ def setup(args):
     """
     cfg = get_cfg()
     add_attribute_config(cfg)
-    add_swint_config(cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.merge_from_list(switch_extract_mode(args.extract_mode))
