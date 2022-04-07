@@ -130,7 +130,7 @@ $ python3 extract_features.py --mode caffe \
          --fastmode
 ```
 
-1. `mode = {'caffe', 'd2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode. `'caffe'` is the default value.
+1. `mode = {'caffe', 'd2'}` refers to the used mode. For the converted model from Caffe, you need to use the `caffe` mode. For other models trained with Detectron2, you need to use the `detectron2` mode. `'caffe'` is the default value. **Note** that the `detecron2` mode need to run with [Ray](https://github.com/ray-project/ray).
 
 2. `num-cpus` refers to the number of cpu cores to use for accelerating the cpu computation. **0** stands for using all possible cpus and **1** is the default value. 
 
@@ -140,7 +140,7 @@ $ python3 extract_features.py --mode caffe \
 
 5. `extract-mode` refers to the modes for feature extraction, including {`roi_feats`, `bboxes` and `bbox_feats`}. 
 
-6. `min-max-boxes` refers to the min-and-max number of features (boxes) to be extracted. 
+6. `min-max-boxes` refers to the min-and-max number of features (boxes) to be extracted. **Note**  that `mode d2` only support to set the min-and-max number as `'100,100'` to get 100 boxes per image or other values to get about 50~60 boxes per image.
 
 7. `image-dir` refers to the input image directory.
 

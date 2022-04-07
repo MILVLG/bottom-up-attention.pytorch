@@ -6,12 +6,15 @@ TridentNet Training Script.
 This script is a simplified version of the training script in detectron2/tools.
 """
 import argparse
+from ast import arg
 import os
 import sys
 import torch
 # import tqdm
 import cv2
 import numpy as np
+
+from utils.extract_d2features import extract_feat_d2_start
 sys.path.append('detectron2')
 
 import detectron2.utils.comm as comm
@@ -44,13 +47,26 @@ def switch_extract_mode(mode):
         print('Wrong extract mode! ')
         exit()
     return switch_cmd
-
-def set_min_max_boxes(min_max_boxes):
+  # ROI_HEADS:  # Add to get 100 box or Delete it to get ~50 boxes
+  #   SCORE_THRESH_TEST: 0.0
+  #   NMS_THRESH_TEST: 0.3   
+def set_min_max_boxes(min_max_boxes, mode):
     if min_max_boxes == 'min_max_default':
         return []
     try:
         min_boxes = int(min_max_boxes.split(',')[0])
         max_boxes = int(min_max_boxes.split(',')[1])
+        if mode == "caffe":
+            pass
+        elif mode == "d2":
+            if min_boxes == 100 & max_boxes == 100:
+                cmd = ['MODEL.BUA.EXTRACTOR.MIN_BOXES', min_boxes, 
+                        'MODEL.BUA.EXTRACTOR.MAX_BOXES', max_boxes,
+                        'MODEL.ROI_HEADS.SCORE_THRESH_TEST', 0.0,
+                        'MODEL.ROI_HEADS.NMS_THRESH_TEST', 0.3 ]
+                return cmd
+        else:
+            raise Exception("detection mode not supported: {}".format(mode))
     except:
         print('Illegal min-max boxes setting, using config default. ')
         return []
@@ -68,7 +84,7 @@ def setup(args):
     cfg.merge_from_list(args.opts)
     cfg.merge_from_list(['MODEL.BUA.EXTRACT_FEATS',True])
     cfg.merge_from_list(switch_extract_mode(args.extract_mode))
-    cfg.merge_from_list(set_min_max_boxes(args.min_max_boxes))
+    cfg.merge_from_list(set_min_max_boxes(args.min_max_boxes, args.mode))
     cfg.freeze()
     default_setup(cfg, args)
     return cfg
@@ -127,16 +143,22 @@ def main():
     cfg = setup(args)
     num_gpus = len(args.gpu_id.split(','))
     print(args.mode)
-    if args.fastmode: # faster.py
-        print("faster")
-        extract_feat_faster_start(args,cfg)
-    else:  # multi or single
-        if num_gpus == 1: # without ray
-            print("single")
-            extract_feat_singlegpu_start(args,cfg)
-        else: # use ray to accelerate
-            print("multi")
-            extract_feat_multigpu_start(args,cfg)
+    if args.mode == "caffe":
+        if args.fastmode: # faster.py
+            print("faster")
+            extract_feat_faster_start(args,cfg)
+        else:  # multi or single
+            if num_gpus == 1: # without ray
+                print("single")
+                extract_feat_singlegpu_start(args,cfg)
+            else: # use ray to accelerate
+                print("multi")
+                extract_feat_multigpu_start(args,cfg)
+    elif args.mode == "d2":
+        print("d2 mode use ray")
+        extract_feat_d2_start(args,cfg)
+    else:
+        raise Exception("detection model not supported: {}".format(args.model))
 
 if __name__ == "__main__":
     main()

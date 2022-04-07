@@ -2,3 +2,4 @@ from .utils import save_features
 from .extract_features_faster import extract_feat_faster_start
 from .extract_features_multigpu import extract_feat_multigpu_start
 from .extract_features_singlegpu import extract_feat_singlegpu_start
+from .extract_d2features import extract_feat_d2_start

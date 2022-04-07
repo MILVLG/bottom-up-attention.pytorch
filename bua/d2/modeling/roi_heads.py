@@ -347,3 +347,7 @@ class AttributeStandardROIHeads(AttributeROIHeads, StandardROIHeads):
         box_features = self.box_pooler(features, [x.proposal_boxes for x in proposals])
         fc7, fc6  = self.box_head(box_features)
         return box_features, fc7, fc6
+
+
+def register():
+    print("regits")
