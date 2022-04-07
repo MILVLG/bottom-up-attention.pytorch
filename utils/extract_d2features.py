@@ -266,7 +266,7 @@ def model_inference(model, batched_inputs, extract_mode, dump_folder, image_h, i
             return [bboxes], [cls_probs], [pooled_features], [attr_probs]
         else:
             return [bboxes], [cls_probs], [pooled_features]
-    else:  # extract mode ==2  
+    else:  # extract mode == 3
         # postprocess
         height = images[0].shape[1]
         width = images[0].shape[2]
